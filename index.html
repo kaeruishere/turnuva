@@ -1,13 +1,930 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PES Ligi</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>PES Ligi</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <div class="spinner-wrap"><div class="spinner"></div></div>
+  </div>
+
+  <!-- Firebase CDN -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, getDocs, addDoc, updateDoc, collection, query, where, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ─── FIREBASE CONFIG ───────────────────────────────────────────────────────
+    const firebaseConfig = {
+      apiKey: "AIzaSyCII19pXF_SLL2Tkjw3FeaPxYHNQ_b3J_Q",
+      authDomain: "turnuva-kaeru.firebaseapp.com",
+      projectId: "turnuva-kaeru",
+      storageBucket: "turnuva-kaeru.firebasestorage.app",
+      messagingSenderId: "2078204583",
+      appId: "1:2078204583:web:2c83665f82417e3e843182"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ─── STATE ─────────────────────────────────────────────────────────────────
+    let currentUser = null;
+    let userProfile = null;
+    let currentTournament = null;
+    let currentMatches = [];
+    let currentPage = 'home'; // home | tournament
+    let currentTab = 'standings'; // standings | fixtures | stats | h2h | admin
+    let fixtureFilter = 'all';
+
+    // ─── ROUTER ────────────────────────────────────────────────────────────────
+    onAuthStateChanged(auth, async (user) => {
+      currentUser = user;
+      if (user) {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        userProfile = snap.exists() ? snap.data() : null;
+        renderApp();
+      } else {
+        renderApp();
+      }
+    });
+
+    function renderApp() {
+      const app = document.getElementById('app');
+      if (!currentUser) { app.innerHTML = renderAuth(); bindAuth(); return; }
+      if (currentPage === 'home') { app.innerHTML = renderLayout(renderHome()); bindHome(); return; }
+      if (currentPage === 'tournament') { app.innerHTML = renderLayout(renderTournamentSkeleton()); bindNav(); loadTournamentPage(); return; }
+    }
+
+    function renderLayout(content) {
+      const username = userProfile?.username || currentUser?.displayName || 'Oyuncu';
+      return `
+        <nav class="navbar">
+          <a class="navbar-brand" id="go-home">⚽ <span>PES</span> LİGİ</a>
+          <div class="navbar-actions">
+            <span class="nav-user">${username}</span>
+            <button class="btn btn-ghost btn-sm" id="logout-btn">Çıkış</button>
+          </div>
+        </nav>
+        <main class="main-content" id="main-content">
+          ${content}
+        </main>
+      `;
+    }
+
+    function bindNav() {
+      document.getElementById('go-home')?.addEventListener('click', () => {
+        currentPage = 'home'; currentTournament = null; renderApp();
+      });
+      document.getElementById('logout-btn')?.addEventListener('click', () => signOut(auth));
+    }
+
+    // ─── AUTH ──────────────────────────────────────────────────────────────────
+    function renderAuth() {
+      return `
+        <div class="auth-wrap">
+          <div class="auth-glow"></div>
+          <div class="auth-inner">
+            <div class="auth-brand">
+              <div class="auth-icon">🏆</div>
+              <h1 class="display">PES <span class="text-accent">LİGİ</span></h1>
+              <p class="text-muted text-sm">Turnuva takip platformu</p>
+            </div>
+            <div class="card">
+              <div style="padding:24px">
+                <div class="tabs mb-16" id="auth-tabs">
+                  <button class="tab active" data-mode="login">Giriş Yap</button>
+                  <button class="tab" data-mode="register">Kayıt Ol</button>
+                </div>
+                <div id="auth-error"></div>
+                <form id="auth-form">
+                  <div id="username-field" class="form-group" style="display:none">
+                    <label class="form-label">Kullanıcı Adı</label>
+                    <input class="form-input" id="f-username" placeholder="kanka123" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input class="form-input" id="f-email" type="email" placeholder="sen@email.com" required />
+                  </div>
+                  <div class="form-group" style="margin-bottom:20px">
+                    <label class="form-label">Şifre</label>
+                    <input class="form-input" id="f-password" type="password" placeholder="••••••••" required />
+                  </div>
+                  <button class="btn btn-primary btn-full btn-lg" type="submit" id="auth-submit">Giriş Yap</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function bindAuth() {
+      let mode = 'login';
+      document.querySelectorAll('#auth-tabs .tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          mode = btn.dataset.mode;
+          document.querySelectorAll('#auth-tabs .tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('username-field').style.display = mode === 'register' ? 'block' : 'none';
+          document.getElementById('auth-submit').textContent = mode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
+        });
+      });
+
+      document.getElementById('auth-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const errEl = document.getElementById('auth-error');
+        errEl.innerHTML = '';
+        const email = document.getElementById('f-email').value;
+        const password = document.getElementById('f-password').value;
+        const username = document.getElementById('f-username').value.trim();
+        const btn = document.getElementById('auth-submit');
+        btn.disabled = true; btn.textContent = 'Bekle...';
+        try {
+          if (mode === 'register') {
+            if (!username) throw { message: 'Kullanıcı adı gerekli' };
+            const res = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(res.user, { displayName: username });
+            await setDoc(doc(db, 'users', res.user.uid), {
+              uid: res.user.uid, username, email, createdAt: new Date(),
+            });
+          } else {
+            await signInWithEmailAndPassword(auth, email, password);
+          }
+        } catch (err) {
+          const msgs = {
+            'auth/email-already-in-use': 'Bu email zaten kayıtlı',
+            'auth/invalid-email': 'Geçersiz email',
+            'auth/weak-password': 'Şifre en az 6 karakter olmalı',
+            'auth/invalid-credential': 'Email veya şifre hatalı',
+          };
+          errEl.innerHTML = `<div class="alert alert-error">${msgs[err.code] || err.message || 'Bir hata oluştu'}</div>`;
+          btn.disabled = false;
+          btn.textContent = mode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
+        }
+      });
+    }
+
+    // ─── HOME ──────────────────────────────────────────────────────────────────
+    function renderHome(tournaments = [], loading = true) {
+      const username = userProfile?.username || currentUser?.displayName || 'Oyuncu';
+      return `
+        <div class="accent-line"></div>
+        <h1 class="display" style="font-size:1.8rem;letter-spacing:.06em">
+          HOŞ GELDİN, <span class="text-accent">${username.toUpperCase()}</span>
+        </h1>
+        <p class="text-muted text-sm mt-8 mb-24">Turnuvalarını yönet ve takip et</p>
+
+        <div class="grid-2 mb-24">
+          <button class="btn btn-primary btn-lg" id="open-create">＋ Turnuva Oluştur</button>
+          <button class="btn btn-secondary btn-lg" id="open-join"># Katıl</button>
+        </div>
+
+        <div class="section-title">🏆 Turnuvalarım</div>
+
+        <div id="tournament-list">
+          ${loading ? '<div class="spinner" style="margin:32px auto"></div>' : renderTournamentList(tournaments)}
+        </div>
+
+        <!-- Create Modal -->
+        <div class="modal-overlay hidden" id="modal-create">
+          <div class="modal">
+            <div class="modal-title">Yeni Turnuva <button class="btn btn-ghost btn-sm modal-close">✕</button></div>
+            <div id="create-error"></div>
+            <form id="create-form">
+              <div class="form-group">
+                <label class="form-label">Turnuva Adı</label>
+                <input class="form-input" id="c-name" placeholder="Kuzin Ligi 2025" required />
+              </div>
+              <p class="text-muted text-sm mb-16">Oluşturulunca bir join kodu alacaksın.</p>
+              <button class="btn btn-primary btn-full" type="submit" id="create-submit">Oluştur</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Join Modal -->
+        <div class="modal-overlay hidden" id="modal-join">
+          <div class="modal">
+            <div class="modal-title">Turnuvaya Katıl <button class="btn btn-ghost btn-sm modal-close">✕</button></div>
+            <div id="join-error"></div>
+            <form id="join-form">
+              <div class="form-group">
+                <label class="form-label">Join Kodu</label>
+                <input class="form-input" id="j-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:.2em;font-size:1.1rem" required />
+              </div>
+              <button class="btn btn-primary btn-full" type="submit" id="join-submit">Katıl</button>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTournamentList(tournaments) {
+      if (!tournaments.length) return `
+        <div class="empty-state">
+          <div class="empty-state-icon">⚽</div>
+          <p>Henüz bir turnuvan yok.</p>
+          <p class="mt-8">Oluştur veya join kodu ile katıl!</p>
+        </div>`;
+      return tournaments.map(t => {
+        const isAdmin = t.adminUid === currentUser.uid;
+        const statusMap = { waiting: ['badge-yellow','Bekleniyor'], active: ['badge-green','⚡ Aktif'], finished: ['badge-gray','Bitti'] };
+        const [cls, label] = statusMap[t.status] || statusMap.waiting;
+        return `
+          <div class="tournament-item" data-id="${t.id}">
+            <div class="tournament-icon">🏆</div>
+            <div class="tournament-info">
+              <div class="tournament-name">
+                ${t.name}
+                ${isAdmin ? '<span class="badge badge-blue" style="font-size:.6rem">ADMİN</span>' : ''}
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+                <span class="badge ${cls}">${label}</span>
+                <span class="text-muted" style="font-size:.78rem">👥 ${t.players?.length || 0} oyuncu</span>
+                ${t.status === 'waiting' ? `<span style="color:var(--text-muted);font-size:.78rem;font-family:'Bebas Neue';letter-spacing:.1em">${t.joinCode}</span>` : ''}
+              </div>
+            </div>
+            <span style="color:var(--text-muted)">›</span>
+          </div>`;
+      }).join('');
+    }
+
+    async function bindHome() {
+      bindNav();
+      // Load tournaments
+      const list = await getUserTournaments();
+      document.getElementById('tournament-list').innerHTML = renderTournamentList(list);
+      document.querySelectorAll('.tournament-item').forEach(el => {
+        el.addEventListener('click', () => {
+          currentPage = 'tournament';
+          currentTournament = el.dataset.id;
+          currentTab = 'standings';
+          renderApp();
+        });
+      });
+
+      // Modals
+      document.getElementById('open-create').addEventListener('click', () => document.getElementById('modal-create').classList.remove('hidden'));
+      document.getElementById('open-join').addEventListener('click', () => document.getElementById('modal-join').classList.remove('hidden'));
+      document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', () => btn.closest('.modal-overlay').classList.add('hidden'));
+      });
+      document.querySelectorAll('.modal-overlay').forEach(el => {
+        el.addEventListener('click', e => { if (e.target === el) el.classList.add('hidden'); });
+      });
+
+      // Create
+      document.getElementById('create-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('create-submit');
+        btn.disabled = true; btn.textContent = 'Oluşturuluyor...';
+        try {
+          const name = document.getElementById('c-name').value;
+          const username = userProfile?.username || currentUser.displayName;
+          await createTournament(username, name);
+          currentPage = 'home'; renderApp();
+        } catch (err) {
+          document.getElementById('create-error').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+          btn.disabled = false; btn.textContent = 'Oluştur';
+        }
+      });
+
+      // Join
+      document.getElementById('join-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('join-submit');
+        btn.disabled = true; btn.textContent = 'Katılıyor...';
+        try {
+          const code = document.getElementById('j-code').value.toUpperCase();
+          const username = userProfile?.username || currentUser.displayName;
+          await joinTournament(code, username);
+          currentPage = 'home'; renderApp();
+        } catch (err) {
+          document.getElementById('join-error').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+          btn.disabled = false; btn.textContent = 'Katıl';
+        }
+      });
+    }
+
+    // ─── TOURNAMENT PAGE ───────────────────────────────────────────────────────
+    function renderTournamentSkeleton() {
+      return `<div class="spinner" style="margin:60px auto"></div>`;
+    }
+
+    async function loadTournamentPage() {
+      try {
+        const [t, m] = await Promise.all([getTournament(currentTournament), getMatches(currentTournament)]);
+        window._t = t; window._m = m;
+        document.getElementById('main-content').innerHTML = renderTournamentPage(t, m);
+        bindTournamentPage(t, m);
+      } catch(e) {
+        document.getElementById('main-content').innerHTML = `<div class="alert alert-error">Turnuva yüklenemedi: ${e.message}</div>`;
+      }
+    }
+
+    function renderTournamentPage(t, m) {
+      const isAdmin = t.adminUid === currentUser.uid;
+      const tabs = [
+        { id:'standings', label:'Puan' },
+        { id:'fixtures', label:'Maçlar' },
+        { id:'stats', label:'İstat' },
+        { id:'h2h', label:'H2H' },
+        ...(isAdmin ? [{ id:'admin', label:'Admin' }] : []),
+      ];
+
+      return `
+        <button class="btn btn-ghost btn-sm mb-12" id="back-btn" style="padding-left:6px">‹ Geri</button>
+        <div class="accent-line"></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px">
+          <div>
+            <h1 class="display" style="font-size:1.6rem;letter-spacing:.06em;line-height:1.1">${t.name.toUpperCase()}</h1>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+              ${t.status==='waiting' ? '<span class="badge badge-yellow">Bekleniyor</span>' : ''}
+              ${t.status==='active' ? '<span class="badge badge-green">⚡ Aktif</span>' : ''}
+              ${t.status==='finished' ? '<span class="badge badge-gray">Tamamlandı</span>' : ''}
+              <span class="text-muted" style="font-size:.78rem">👥 ${t.players?.length||0} oyuncu</span>
+            </div>
+          </div>
+          ${t.status==='waiting' ? `
+            <div class="join-code-box" id="copy-code" data-code="${t.joinCode}">
+              <div class="join-code-text">${t.joinCode}</div>
+              <div class="join-code-hint" id="copy-hint">📋 Kopyala</div>
+            </div>` : ''}
+        </div>
+
+        <div class="tabs mb-16" id="main-tabs">
+          ${tabs.map(tb => `<button class="tab ${tb.id===currentTab?'active':''}" data-tab="${tb.id}">${tb.label}</button>`).join('')}
+        </div>
+
+        <div id="tab-content">
+          ${renderTab(t, m, currentTab)}
+        </div>
+
+        ${renderMatchModal()}
+      `;
+    }
+
+    function renderTab(t, m, tab) {
+      const standings = calcStandings(t.players||[], m);
+      if (tab === 'standings') return renderStandings(standings);
+      if (tab === 'fixtures') return renderFixtures(m);
+      if (tab === 'stats') return renderStats(standings, m);
+      if (tab === 'h2h') return renderH2H(t.players||[], m);
+      if (tab === 'admin') return renderAdmin(t, m);
+      return '';
+    }
+
+    function bindTournamentPage(t, m) {
+      document.getElementById('back-btn')?.addEventListener('click', () => {
+        currentPage = 'home'; currentTournament = null; renderApp();
+      });
+      document.getElementById('logout-btn')?.addEventListener('click', () => signOut(auth));
+      document.getElementById('go-home')?.addEventListener('click', () => {
+        currentPage = 'home'; currentTournament = null; renderApp();
+      });
+
+      // Copy code
+      document.getElementById('copy-code')?.addEventListener('click', function() {
+        navigator.clipboard.writeText(this.dataset.code).catch(()=>{});
+        document.getElementById('copy-hint').textContent = '✅ Kopyalandı';
+        setTimeout(() => { if(document.getElementById('copy-hint')) document.getElementById('copy-hint').textContent = '📋 Kopyala'; }, 2000);
+      });
+
+      // Tabs
+      document.querySelectorAll('#main-tabs .tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentTab = btn.dataset.tab;
+          document.querySelectorAll('#main-tabs .tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('tab-content').innerHTML = renderTab(t, m, currentTab);
+          bindTabContent(t, m);
+        });
+      });
+
+      bindTabContent(t, m);
+    }
+
+    function bindTabContent(t, m) {
+      // Fixture filter
+      document.querySelectorAll('.fix-filter').forEach(btn => {
+        btn.addEventListener('click', () => {
+          fixtureFilter = btn.dataset.filter;
+          document.querySelectorAll('.fix-filter').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById('fixture-list').innerHTML = renderFixtureList(m, fixtureFilter);
+          bindFixtureActions(t, m);
+        });
+      });
+      bindFixtureActions(t, m);
+
+      // H2H selects
+      document.getElementById('h2h-p1')?.addEventListener('change', () => updateH2H(t, m));
+      document.getElementById('h2h-p2')?.addEventListener('change', () => updateH2H(t, m));
+
+      // Admin generate
+      document.getElementById('gen-fixture-btn')?.addEventListener('click', async () => {
+        if (t.players.length < 2) return alert('En az 2 oyuncu gerekli');
+        if (!confirm(`${t.players.length} oyuncu için fikstür oluşturulsun mu?`)) return;
+        const btn = document.getElementById('gen-fixture-btn');
+        btn.disabled = true; btn.textContent = 'Oluşturuluyor...';
+        try {
+          await generateFixture(t.id, t.players);
+          await loadTournamentPage();
+        } catch(e) { alert(e.message); btn.disabled = false; btn.textContent = 'Fikstürü Oluştur'; }
+      });
+    }
+
+    function bindFixtureActions(t, m) {
+      // Submit result buttons
+      document.querySelectorAll('.submit-result-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const matchId = btn.dataset.id;
+          const match = m.find(x => x.id === matchId);
+          if (match) openMatchModal(match, t, m);
+        });
+      });
+
+      // Confirm
+      document.querySelectorAll('.confirm-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          btn.disabled = true; btn.textContent = '...';
+          await confirmMatch(btn.dataset.id);
+          await loadTournamentPage();
+        });
+      });
+
+      // Dispute
+      document.querySelectorAll('.dispute-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          btn.disabled = true;
+          await disputeMatch(btn.dataset.id);
+          await loadTournamentPage();
+        });
+      });
+    }
+
+    // ─── STANDINGS ─────────────────────────────────────────────────────────────
+    function renderStandings(standings) {
+      if (!standings.length) return `<div class="empty-state"><div class="empty-state-icon">🏆</div><p>Henüz puan tablosu yok</p></div>`;
+      return `
+        <div class="card" style="overflow-x:auto">
+          <table class="standings-table">
+            <thead><tr>
+              <th>#</th><th style="text-align:left">Oyuncu</th>
+              <th>O</th><th>G</th><th>B</th><th>M</th>
+              <th>GA</th><th>Av</th><th style="color:var(--accent)">P</th>
+            </tr></thead>
+            <tbody>
+              ${standings.map((p,i) => `
+                <tr>
+                  <td><span class="rank-badge rank-${i<3?i+1:'other'}">${i+1}</span></td>
+                  <td><div class="player-cell"><div class="player-avatar">${p.username[0].toUpperCase()}</div><span style="font-weight:600;font-size:.9rem">${p.username}</span></div></td>
+                  <td style="color:var(--text-secondary)">${p.played}</td>
+                  <td style="color:var(--accent)">${p.won}</td>
+                  <td style="color:var(--text-secondary)">${p.drawn}</td>
+                  <td style="color:var(--red)">${p.lost}</td>
+                  <td style="color:var(--text-secondary);font-size:.82rem">${p.goalsFor}:${p.goalsAgainst}</td>
+                  <td style="color:${p.goalDiff>=0?'var(--accent)':'var(--red)'};font-size:.85rem">${p.goalDiff>0?'+':''}${p.goalDiff}</td>
+                  <td style="font-weight:700;font-size:1rem;font-family:'Bebas Neue';letter-spacing:.05em">${p.points}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    // ─── FIXTURES ──────────────────────────────────────────────────────────────
+    function renderFixtures(m) {
+      if (!m.length) return `<div class="empty-state"><div class="empty-state-icon">📅</div><p>Fikstür henüz oluşturulmadı</p></div>`;
+      const submitted = m.filter(x => x.status === 'submitted').length;
+      return `
+        <div class="tabs mb-16" id="fix-tabs">
+          <button class="fix-filter tab ${fixtureFilter==='all'?'active':''}" data-filter="all">Tümü</button>
+          <button class="fix-filter tab ${fixtureFilter==='pending'?'active':''}" data-filter="pending">
+            Bekleyen${submitted>0?` <span class="red-dot">${submitted}</span>`:''}
+          </button>
+          <button class="fix-filter tab ${fixtureFilter==='done'?'active':''}" data-filter="done">Tamamlanan</button>
+        </div>
+        <div id="fixture-list">
+          ${renderFixtureList(m, fixtureFilter)}
+        </div>`;
+    }
+
+    function renderFixtureList(m, filter) {
+      let list = m;
+      if (filter === 'pending') list = m.filter(x => x.status !== 'confirmed');
+      if (filter === 'done') list = m.filter(x => x.status === 'confirmed');
+      if (!list.length) return `<div class="empty-state"><p>Bu filtrede maç yok</p></div>`;
+      return list.map(match => renderMatchCard(match)).join('');
+    }
+
+    function renderMatchCard(m) {
+      const isConfirmed = m.status === 'confirmed';
+      const isSubmitted = m.status === 'submitted';
+      const isDisputed = m.status === 'disputed';
+      const isMyMatch = m.homeUid === currentUser.uid || m.awayUid === currentUser.uid;
+      const canSubmit = (m.status === 'pending' || m.status === 'disputed') && isMyMatch;
+      const canConfirm = isSubmitted && m.submittedBy !== currentUser.uid && isMyMatch;
+
+      let statusBadge = '';
+      if (isConfirmed) statusBadge = '<span class="badge badge-green">✓ Onaylandı</span>';
+      else if (isSubmitted) statusBadge = '<span class="badge badge-yellow">⏳ Onay Bekliyor</span>';
+      else if (isDisputed) statusBadge = '<span class="badge badge-red">⚠ İtiraz</span>';
+      else statusBadge = '<span class="badge badge-gray">Oynanmadı</span>';
+
+      const score = (isConfirmed || isSubmitted)
+        ? `<div class="match-score">${m.homeGoals} <span class="match-score-sep">—</span> ${m.awayGoals}</div>`
+        : `<div class="match-vs">VS</div>`;
+
+      const redCardInfo = isConfirmed && (m.homeRedCards > 0 || m.awayRedCards > 0) ? `
+        <div style="display:flex;justify-content:center;gap:16px;margin-top:6px;flex-wrap:wrap">
+          ${m.homeRedCards > 0 ? `<span style="font-size:.72rem;color:var(--red)">🟥 ${m.homeName}: ${m.homeRedCards}${m.deductHomeRed?' (averajdan düşüldü)':''}</span>` : ''}
+          ${m.awayRedCards > 0 ? `<span style="font-size:.72rem;color:var(--red)">🟥 ${m.awayName}: ${m.awayRedCards}${m.deductAwayRed?' (averajdan düşüldü)':''}</span>` : ''}
+        </div>` : '';
+
+      const actions = canSubmit ? `
+        <div style="margin-top:10px">
+          <button class="btn btn-primary btn-sm btn-full submit-result-btn" data-id="${m.id}">Sonuç Gir</button>
+        </div>` :
+        canConfirm ? `
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-primary btn-sm confirm-btn" data-id="${m.id}" style="flex:1">✓ Onayla</button>
+          <button class="btn btn-danger btn-sm dispute-btn" data-id="${m.id}" style="flex:1">✕ İtiraz</button>
+        </div>` :
+        isSubmitted && m.submittedBy === currentUser.uid ? `
+        <p style="text-align:center;color:var(--text-muted);font-size:.75rem;margin-top:8px">Rakibinin onayı bekleniyor...</p>` : '';
+
+      return `
+        <div class="match-card ${isMyMatch && !isConfirmed ? 'match-card-highlight' : ''}">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="match-team">
+              <div class="player-avatar" style="margin:0 auto 4px;width:26px;height:26px;font-size:.65rem">${m.homeName[0].toUpperCase()}</div>
+              <div class="match-team-name">${m.homeName}</div>
+            </div>
+            <div style="text-align:center;flex-shrink:0">
+              ${score}
+              ${statusBadge}
+            </div>
+            <div class="match-team">
+              <div class="player-avatar" style="margin:0 auto 4px;width:26px;height:26px;font-size:.65rem">${m.awayName[0].toUpperCase()}</div>
+              <div class="match-team-name">${m.awayName}</div>
+            </div>
+          </div>
+          ${redCardInfo}
+          ${actions}
+        </div>`;
+    }
+
+    // ─── STATS ─────────────────────────────────────────────────────────────────
+    function renderStats(standings, m) {
+      const confirmed = m.filter(x => x.status === 'confirmed');
+      const totalGoals = confirmed.reduce((s,x) => s + x.homeGoals + x.awayGoals, 0);
+      const totalRed = confirmed.reduce((s,x) => s + x.homeRedCards + x.awayRedCards, 0);
+      const avgGoals = confirmed.length ? (totalGoals/confirmed.length).toFixed(1) : '—';
+      const topScorer = [...standings].sort((a,b) => b.goalsFor-a.goalsFor)[0];
+      const bestDef = [...standings].sort((a,b) => a.goalsAgainst-b.goalsAgainst)[0];
+      const mostRed = [...standings].sort((a,b) => b.redCards-a.redCards)[0];
+
+      return `
+        <div class="stat-grid mb-16">
+          <div class="stat-box"><div class="stat-value">${confirmed.length}</div><div class="stat-label">Maç</div></div>
+          <div class="stat-box"><div class="stat-value">${totalGoals}</div><div class="stat-label">Toplam Gol</div></div>
+          <div class="stat-box"><div class="stat-value" style="font-size:1.4rem">${avgGoals}</div><div class="stat-label">Maç Başı Gol</div></div>
+          <div class="stat-box"><div class="stat-value" style="color:var(--red)">${totalRed}</div><div class="stat-label">Kırmızı Kart</div></div>
+        </div>
+
+        <div class="card mb-16">
+          <div class="card-header"><span class="card-title">🏅 Liderler</span></div>
+          ${[
+            ['⚽ En Çok Gol', topScorer, `${topScorer?.goalsFor??0} gol`],
+            ['🛡️ En İyi Savunma', bestDef, `${bestDef?.goalsAgainst??0} yenilen`],
+            ['🟥 En Çok Kırmızı', mostRed, `${mostRed?.redCards??0} kart`],
+          ].map(([label,player,val],i) => `
+            <div style="padding:14px 20px;${i<2?'border-bottom:1px solid var(--border)':''};display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:2px">${label}</div>
+                <div style="font-weight:700">${player?.username??'—'}</div>
+              </div>
+              <div style="font-family:'Bebas Neue';font-size:1.2rem;color:var(--accent)">${val}</div>
+            </div>`).join('')}
+        </div>
+
+        <div class="card" style="overflow-x:auto">
+          <div class="card-header"><span class="card-title">📊 Oyuncu Detay</span></div>
+          <table class="standings-table">
+            <thead><tr><th style="text-align:left">Oyuncu</th><th>Gol</th><th>Yenilen</th><th>Av</th><th>🟥</th><th>G%</th></tr></thead>
+            <tbody>
+              ${standings.map(p => `
+                <tr>
+                  <td><div class="player-cell"><div class="player-avatar">${p.username[0].toUpperCase()}</div>${p.username}</div></td>
+                  <td style="color:var(--accent)">${p.goalsFor}</td>
+                  <td style="color:var(--text-secondary)">${p.goalsAgainst}</td>
+                  <td style="color:${p.goalDiff>=0?'var(--accent)':'var(--red)'}">${p.goalDiff>0?'+':''}${p.goalDiff}</td>
+                  <td style="color:var(--red)">${p.redCards}</td>
+                  <td style="color:var(--text-secondary);font-size:.85rem">${p.played>0?Math.round(p.won/p.played*100)+'%':'—'}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    // ─── H2H ───────────────────────────────────────────────────────────────────
+    function renderH2H(players, m) {
+      return `
+        <div class="card mb-16">
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:flex-end">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Oyuncu 1</label>
+                <select class="form-input" id="h2h-p1">
+                  <option value="">Seç</option>
+                  ${players.map(p => `<option value="${p.uid}">${p.username}</option>`).join('')}
+                </select>
+              </div>
+              <div style="padding-bottom:4px;color:var(--text-muted);font-family:'Bebas Neue';font-size:1.2rem">VS</div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Oyuncu 2</label>
+                <select class="form-input" id="h2h-p2">
+                  <option value="">Seç</option>
+                  ${players.map(p => `<option value="${p.uid}">${p.username}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="h2h-result">
+          <div class="empty-state"><div class="empty-state-icon">⚔️</div><p>İki oyuncu seç</p></div>
+        </div>`;
+    }
+
+    function updateH2H(t, m) {
+      const p1 = document.getElementById('h2h-p1')?.value;
+      const p2 = document.getElementById('h2h-p2')?.value;
+      const el = document.getElementById('h2h-result');
+      if (!p1 || !p2 || p1 === p2) { el.innerHTML = `<div class="empty-state"><p>Farklı iki oyuncu seç</p></div>`; return; }
+
+      const h2hM = m.filter(x => x.status==='confirmed' && ((x.homeUid===p1&&x.awayUid===p2)||(x.homeUid===p2&&x.awayUid===p1)));
+      let p1w=0,p2w=0,draws=0;
+      h2hM.forEach(x => {
+        const hg = x.deductHomeRed?Math.max(0,x.homeGoals-x.homeRedCards):x.homeGoals;
+        const ag = x.deductAwayRed?Math.max(0,x.awayGoals-x.awayRedCards):x.awayGoals;
+        const p1g = x.homeUid===p1?hg:ag, p2g = x.homeUid===p1?ag:hg;
+        if(p1g>p2g)p1w++; else if(p2g>p1g)p2w++; else draws++;
+      });
+
+      const p1name = t.players.find(p=>p.uid===p1)?.username||'';
+      const p2name = t.players.find(p=>p.uid===p2)?.username||'';
+
+      el.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-bottom:16px">
+          <div class="stat-box"><div class="stat-value" style="color:var(--accent)">${p1w}</div><div class="stat-label">${p1name}</div></div>
+          <div class="stat-box"><div class="stat-value" style="color:var(--text-secondary)">${draws}</div><div class="stat-label">Beraberlik</div></div>
+          <div class="stat-box"><div class="stat-value" style="color:var(--blue)">${p2w}</div><div class="stat-label">${p2name}</div></div>
+        </div>
+        ${h2hM.length ? h2hM.map(x=>`
+          <div class="match-card">
+            <div style="display:flex;align-items:center;gap:8px;width:100%">
+              <div class="match-team"><div class="match-team-name">${x.homeName}</div></div>
+              <div class="match-score">${x.homeGoals}<span class="match-score-sep">—</span>${x.awayGoals}</div>
+              <div class="match-team"><div class="match-team-name">${x.awayName}</div></div>
+            </div>
+          </div>`).join('') : '<div class="empty-state"><p>Henüz karşılaşma yok</p></div>'}`;
+    }
+
+    // ─── ADMIN ─────────────────────────────────────────────────────────────────
+    function renderAdmin(t, m) {
+      return `
+        <div class="card mb-16">
+          <div class="card-header"><span class="card-title">🔑 Join Kodu</span></div>
+          <div class="card-body">
+            <div class="join-code">${t.joinCode}</div>
+            <p class="text-muted text-sm text-center">Bu kodu arkadaşlarınla paylaş</p>
+          </div>
+        </div>
+
+        <div class="card mb-16">
+          <div class="card-header"><span class="card-title">👥 Oyuncular (${t.players?.length})</span></div>
+          ${(t.players||[]).map((p,i) => `
+            <div style="padding:12px 20px;${i<t.players.length-1?'border-bottom:1px solid var(--border)':''};display:flex;align-items:center;gap:12px">
+              <div class="player-avatar">${p.username[0].toUpperCase()}</div>
+              <span style="font-weight:600">${p.username}</span>
+              ${p.uid===t.adminUid?'<span class="badge badge-blue">Admin</span>':''}
+            </div>`).join('')}
+        </div>
+
+        ${!m.length && t.status==='waiting' ? `
+          <div class="card">
+            <div class="card-body">
+              <h3 style="font-family:'Bebas Neue';font-size:1.1rem;margin-bottom:8px">⚡ Fikstür Oluştur</h3>
+              <p class="text-muted text-sm mb-16">Tüm oyuncular katıldıktan sonra lig fikstürünü oluştur.</p>
+              <button class="btn btn-primary btn-full" id="gen-fixture-btn" ${t.players?.length<2?'disabled':''}>
+                Fikstürü Oluştur (${t.players?.length} oyuncu)
+              </button>
+            </div>
+          </div>` : m.length ? `<div class="alert alert-success">✅ Fikstür oluşturuldu — ${m.length} maç</div>` : ''}
+      `;
+    }
+
+    // ─── MATCH MODAL ───────────────────────────────────────────────────────────
+    function renderMatchModal() {
+      return `
+        <div class="modal-overlay hidden" id="modal-match">
+          <div class="modal">
+            <div class="modal-title">Maç Sonucu <button class="btn btn-ghost btn-sm" id="match-modal-close">✕</button></div>
+            <div id="match-modal-body"></div>
+          </div>
+        </div>`;
+    }
+
+    function openMatchModal(match, t, m) {
+      const modal = document.getElementById('modal-match');
+      document.getElementById('match-modal-body').innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div style="text-align:center;flex:1">
+            <div class="player-avatar" style="margin:0 auto 4px">${match.homeName[0].toUpperCase()}</div>
+            <div style="font-weight:700;font-size:.9rem">${match.homeName}</div>
+          </div>
+          <div style="font-family:'Bebas Neue';font-size:1rem;color:var(--text-muted);letter-spacing:.1em">VS</div>
+          <div style="text-align:center;flex:1">
+            <div class="player-avatar" style="margin:0 auto 4px">${match.awayName[0].toUpperCase()}</div>
+            <div style="font-weight:700;font-size:.9rem">${match.awayName}</div>
+          </div>
+        </div>
+        <form id="result-form">
+          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:flex-end;margin-bottom:16px">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">${match.homeName}</label>
+              <input class="form-input" id="r-hgoals" type="number" min="0" max="99" placeholder="0" required style="text-align:center;font-size:1.5rem;font-family:'Bebas Neue'" />
+            </div>
+            <div style="padding-bottom:2px;color:var(--text-muted);font-family:'Bebas Neue';font-size:1.5rem">—</div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">${match.awayName}</label>
+              <input class="form-input" id="r-agoals" type="number" min="0" max="99" placeholder="0" required style="text-align:center;font-size:1.5rem;font-family:'Bebas Neue'" />
+            </div>
+          </div>
+
+          <div style="background:var(--bg-elevated);border-radius:10px;padding:14px;margin-bottom:16px">
+            <div style="font-size:.75rem;font-weight:700;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">🟥 Kırmızı Kartlar (Opsiyonel)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div>
+                <label class="form-label" style="font-size:.7rem">${match.homeName}</label>
+                <input class="form-input" id="r-hred" type="number" min="0" max="11" value="0" style="text-align:center" />
+                <label class="form-check mt-8" id="r-hdeduct-wrap" style="display:none">
+                  <input type="checkbox" id="r-hdeduct" />
+                  <span style="font-size:.75rem;color:var(--text-secondary)">Averajdan düş</span>
+                </label>
+              </div>
+              <div>
+                <label class="form-label" style="font-size:.7rem">${match.awayName}</label>
+                <input class="form-input" id="r-ared" type="number" min="0" max="11" value="0" style="text-align:center" />
+                <label class="form-check mt-8" id="r-adeduct-wrap" style="display:none">
+                  <input type="checkbox" id="r-adeduct" />
+                  <span style="font-size:.75rem;color:var(--text-secondary)">Averajdan düş</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-info mb-16" style="font-size:.78rem">ℹ️ Rakibinin onayı gerekecek.</div>
+          <button class="btn btn-primary btn-full" type="submit" id="result-submit">Sonucu Gönder</button>
+        </form>`;
+
+      modal.classList.remove('hidden');
+
+      document.getElementById('match-modal-close').onclick = () => modal.classList.add('hidden');
+      modal.onclick = (e) => { if(e.target===modal) modal.classList.add('hidden'); };
+
+      document.getElementById('r-hred').oninput = function() {
+        document.getElementById('r-hdeduct-wrap').style.display = +this.value > 0 ? 'flex' : 'none';
+      };
+      document.getElementById('r-ared').oninput = function() {
+        document.getElementById('r-adeduct-wrap').style.display = +this.value > 0 ? 'flex' : 'none';
+      };
+
+      document.getElementById('result-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('result-submit');
+        btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+        try {
+          await submitResult(
+            match.id, currentUser.uid,
+            +document.getElementById('r-hgoals').value,
+            +document.getElementById('r-agoals').value,
+            +document.getElementById('r-hred').value,
+            +document.getElementById('r-ared').value,
+            document.getElementById('r-hdeduct').checked,
+            document.getElementById('r-adeduct').checked,
+          );
+          modal.classList.add('hidden');
+          await loadTournamentPage();
+        } catch(err) {
+          alert(err.message);
+          btn.disabled = false; btn.textContent = 'Sonucu Gönder';
+        }
+      };
+    }
+
+    // ─── FIRESTORE SERVICE ─────────────────────────────────────────────────────
+    async function createTournament(adminName, name) {
+      const code = Math.random().toString(36).substring(2,8).toUpperCase();
+      await addDoc(collection(db,'tournaments'), {
+        name, adminUid: currentUser.uid, adminName, joinCode: code,
+        status: 'waiting', players: [{uid:currentUser.uid,username:adminName}],
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    async function joinTournament(code, username) {
+      const q = query(collection(db,'tournaments'), where('joinCode','==',code));
+      const snap = await getDocs(q);
+      if (snap.empty) throw new Error('Turnuva bulunamadı');
+      const tDoc = snap.docs[0];
+      if (tDoc.data().status !== 'waiting') throw new Error('Turnuva zaten başladı');
+      if (tDoc.data().players.find(p=>p.uid===currentUser.uid)) throw new Error('Zaten katıldınız');
+      await updateDoc(doc(db,'tournaments',tDoc.id), { players: arrayUnion({uid:currentUser.uid,username}) });
+    }
+
+    async function getUserTournaments() {
+      const snap = await getDocs(collection(db,'tournaments'));
+      return snap.docs.map(d=>({id:d.id,...d.data()}))
+        .filter(t=>t.players?.some(p=>p.uid===currentUser.uid))
+        .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    }
+
+    async function getTournament(id) {
+      const snap = await getDoc(doc(db,'tournaments',id));
+      if (!snap.exists()) throw new Error('Turnuva bulunamadı');
+      return {id:snap.id,...snap.data()};
+    }
+
+    async function getMatches(tournamentId) {
+      const q = query(collection(db,'matches'), where('tournamentId','==',tournamentId));
+      const snap = await getDocs(q);
+      return snap.docs.map(d=>({id:d.id,...d.data()}));
+    }
+
+    async function generateFixture(tournamentId, players) {
+      const batch = [];
+      for (let i=0;i<players.length;i++) {
+        for (let j=i+1;j<players.length;j++) {
+          batch.push(addDoc(collection(db,'matches'), {
+            tournamentId, homeUid:players[i].uid, homeName:players[i].username,
+            awayUid:players[j].uid, awayName:players[j].username,
+            status:'pending', homeGoals:null, awayGoals:null,
+            homeRedCards:0, awayRedCards:0, deductHomeRed:false, deductAwayRed:false,
+            submittedBy:null, createdAt:serverTimestamp(),
+          }));
+        }
+      }
+      await Promise.all(batch);
+      await updateDoc(doc(db,'tournaments',tournamentId), {status:'active'});
+    }
+
+    async function submitResult(matchId, uid, hg, ag, hr, ar, dh, da) {
+      await updateDoc(doc(db,'matches',matchId), {
+        status:'submitted', homeGoals:hg, awayGoals:ag,
+        homeRedCards:hr, awayRedCards:ar, deductHomeRed:dh, deductAwayRed:da,
+        submittedBy:uid, submittedAt:serverTimestamp(),
+      });
+    }
+
+    async function confirmMatch(matchId) {
+      await updateDoc(doc(db,'matches',matchId), {status:'confirmed', confirmedAt:serverTimestamp()});
+    }
+
+    async function disputeMatch(matchId) {
+      await updateDoc(doc(db,'matches',matchId), {status:'disputed'});
+    }
+
+    // ─── CALC STANDINGS ────────────────────────────────────────────────────────
+    function calcStandings(players, matches) {
+      const table = {};
+      players.forEach(p => {
+        table[p.uid] = {uid:p.uid,username:p.username,played:0,won:0,drawn:0,lost:0,goalsFor:0,goalsAgainst:0,redCards:0,points:0};
+      });
+      matches.filter(m=>m.status==='confirmed').forEach(m => {
+        const h=table[m.homeUid], a=table[m.awayUid];
+        if(!h||!a) return;
+        let hg = m.deductHomeRed?Math.max(0,m.homeGoals-m.homeRedCards):m.homeGoals;
+        let ag = m.deductAwayRed?Math.max(0,m.awayGoals-m.awayRedCards):m.awayGoals;
+        h.played++; a.played++;
+        h.goalsFor+=hg; h.goalsAgainst+=ag;
+        a.goalsFor+=ag; a.goalsAgainst+=hg;
+        h.redCards+=m.homeRedCards; a.redCards+=m.awayRedCards;
+        if(hg>ag){h.won++;h.points+=3;a.lost++;}
+        else if(ag>hg){a.won++;a.points+=3;h.lost++;}
+        else{h.drawn++;h.points++;a.drawn++;a.points++;}
+      });
+      return Object.values(table)
+        .map(p=>({...p,goalDiff:p.goalsFor-p.goalsAgainst}))
+        .sort((a,b)=>b.points-a.points||b.goalDiff-a.goalDiff||b.goalsFor-a.goalsFor);
+    }
+  </script>
+</body>
 </html>
