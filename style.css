@@ -1,0 +1,743 @@
+    :root {
+        --bg: #07090f;
+        --card: #0c1018;
+        --el: #121b24;
+        --hover: #18242f;
+        --border: rgba(255, 255, 255, .06);
+        --border-hi: rgba(255, 255, 255, .11);
+        --accent: #00e5a0;
+        --accent-dim: rgba(0, 229, 160, .08);
+        --accent-glow: rgba(0, 229, 160, .22);
+        --red: #ff4560;
+        --text: #edf2f7;
+        --text2: #6b8094;
+        --text3: #283848;
+        --gold: #ffd700;
+        --silver: #b0bec5;
+        --bronze: #cd7f32;
+        --nav-h: 52px;
+        --bnav-h: 62px;
+    }
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--el);
+        border-radius: 99px;
+    }
+
+    /* ─── TOP NAV ─── */
+    .nav {
+        background: rgba(7, 9, 15, .96);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 16px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: var(--nav-h);
+    }
+
+    .nav-brand {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 1.45rem;
+        letter-spacing: .12em;
+        color: var(--accent);
+    }
+
+    .nav-brand span {
+        color: var(--text);
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .nav-user {
+        font-size: .78rem;
+        color: var(--text2);
+        font-weight: 600;
+    }
+
+    /* ─── BOTTOM NAV ─── */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(7, 9, 15, .97);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid var(--border);
+        display: flex;
+        height: var(--bnav-h);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .bnav-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text3);
+        font-family: 'DM Sans', sans-serif;
+        transition: color .13s;
+        padding: 8px 0;
+    }
+
+    .bnav-btn.active {
+        color: var(--accent);
+    }
+
+    .bnav-btn:hover {
+        color: var(--text2);
+    }
+
+    .bnav-icon {
+        font-size: 1.25rem;
+    }
+
+    .bnav-label {
+        font-size: .66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    /* ─── MAIN ─── */
+    .main {
+        padding: 18px 14px calc(var(--bnav-h) + 20px);
+        max-width: 820px;
+        margin: 0 auto;
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 9px;
+        font-family: 'DM Sans', sans-serif;
+        font-weight: 600;
+        font-size: .84rem;
+        cursor: pointer;
+        border: none;
+        transition: all .13s;
+        white-space: nowrap;
+    }
+
+    .btn:active {
+        transform: scale(.97);
+    }
+
+    .btn:disabled {
+        opacity: .4;
+        cursor: not-allowed;
+    }
+
+    .btn-primary {
+        background: var(--accent);
+        color: #000;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background: #00ffb3;
+    }
+
+    .btn-secondary {
+        background: var(--el);
+        color: var(--text);
+        border: 1px solid var(--border-hi);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+        background: var(--hover);
+    }
+
+    .btn-danger {
+        background: rgba(255, 69, 96, .12);
+        color: var(--red);
+        border: 1px solid rgba(255, 69, 96, .25);
+    }
+
+    .btn-ghost {
+        background: transparent;
+        color: var(--text2);
+        border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+        background: var(--el);
+        color: var(--text);
+    }
+
+    .btn-sm {
+        padding: 5px 11px;
+        font-size: .77rem;
+    }
+
+    .btn-full {
+        width: 100%;
+    }
+
+    /* ─── CARD ─── */
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 14px;
+    }
+
+    .card-header {
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* ─── FORM ─── */
+    .fi {
+        width: 100%;
+        background: var(--el);
+        border: 1px solid var(--border-hi);
+        border-radius: 9px;
+        padding: 10px 13px;
+        color: var(--text);
+        outline: none;
+        font-size: .9rem;
+        font-family: 'DM Sans', sans-serif;
+        transition: border-color .13s;
+    }
+
+    .fi:focus {
+        border-color: var(--accent);
+    }
+
+    .fi::placeholder {
+        color: var(--text3);
+    }
+
+    .fi-group {
+        margin-bottom: 13px;
+    }
+
+    .fi-label {
+        font-size: .74rem;
+        font-weight: 600;
+        color: var(--text2);
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    /* ─── LOGIN ─── */
+    .login-wrap {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .login-box {
+        background: var(--card);
+        border: 1px solid var(--border-hi);
+        border-radius: 18px;
+        padding: 36px 28px;
+        width: 100%;
+        max-width: 360px;
+    }
+
+    .login-logo {
+        text-align: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 2.2rem;
+        letter-spacing: .14em;
+        color: var(--accent);
+        margin-bottom: 6px;
+    }
+
+    .login-logo span {
+        color: var(--text);
+    }
+
+    .login-sub {
+        text-align: center;
+        font-size: .8rem;
+        color: var(--text2);
+        margin-bottom: 28px;
+    }
+
+    .login-err {
+        background: rgba(255, 69, 96, .1);
+        border: 1px solid rgba(255, 69, 96, .2);
+        border-radius: 8px;
+        padding: 9px 12px;
+        font-size: .82rem;
+        color: var(--red);
+        margin-bottom: 13px;
+    }
+
+    /* ─── SEC LABEL ─── */
+    .sec-label {
+        font-size: .68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        color: var(--text2);
+        margin-bottom: 10px;
+        margin-top: 22px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sec-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+    }
+
+    .sec-label:first-child {
+        margin-top: 0;
+    }
+
+    /* ─── TOURNAMENT CARDS ─── */
+    .t-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all .14s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .t-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--accent);
+        opacity: 0;
+        transition: opacity .14s;
+    }
+
+    .t-card.active-t::before {
+        opacity: 1;
+    }
+
+    .t-card:hover {
+        background: var(--hover);
+        border-color: var(--border-hi);
+    }
+
+    .t-card-name {
+        font-weight: 700;
+        font-size: .95rem;
+        margin-bottom: 3px;
+    }
+
+    .t-card-meta {
+        font-size: .75rem;
+        color: var(--text2);
+    }
+
+    .t-badge {
+        font-size: .65rem;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 5px;
+        text-transform: uppercase;
+    }
+
+    .t-badge.active {
+        background: var(--accent-dim);
+        color: var(--accent);
+        border: 1px solid var(--accent-glow);
+    }
+
+    .t-badge.done {
+        background: var(--el);
+        color: var(--text2);
+        border: 1px solid var(--border);
+    }
+
+    /* ─── STANDINGS TABLE ─── */
+    .stbl {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .stbl th {
+        font-size: .63rem;
+        font-weight: 700;
+        color: var(--text3);
+        padding: 9px 8px;
+        text-align: center;
+        border-bottom: 1px solid var(--border);
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    .stbl td {
+        padding: 10px 8px;
+        text-align: center;
+        border-bottom: 1px solid var(--border);
+        font-size: .86rem;
+    }
+
+    .stbl tr:last-child td {
+        border-bottom: none;
+    }
+
+    .stbl tr:hover td {
+        background: var(--el);
+    }
+
+    .stbl td.pl-name {
+        text-align: left;
+        font-weight: 600;
+        padding-left: 12px;
+    }
+
+    .rank-1 {
+        color: var(--gold);
+    }
+
+    .rank-2 {
+        color: var(--silver);
+    }
+
+    .rank-3 {
+        color: var(--bronze);
+    }
+
+    /* ─── NEXT MATCH ─── */
+    .next-match {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 14px;
+        gap: 10px;
+    }
+
+    .nm-team {
+        flex: 1;
+        text-align: center;
+        font-weight: 700;
+        font-size: .95rem;
+    }
+
+    .nm-vs {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 1.5rem;
+        color: var(--accent);
+        padding: 0 10px;
+        letter-spacing: .08em;
+    }
+
+    .nm-slot {
+        font-size: .72rem;
+        color: var(--text2);
+        text-align: center;
+        padding: 0 14px 12px;
+    }
+
+    /* ─── FIXTURE ─── */
+    .match-row {
+        display: flex;
+        align-items: center;
+        padding: 11px 13px;
+        border-bottom: 1px solid var(--border);
+        gap: 8px;
+        cursor: pointer;
+        transition: background .12s;
+    }
+
+    .match-row:last-child {
+        border-bottom: none;
+    }
+
+    .match-row:hover {
+        background: var(--el);
+    }
+
+    .match-row.done-match {
+        opacity: .75;
+    }
+
+    .mr-team {
+        flex: 1;
+        font-size: .88rem;
+        font-weight: 600;
+    }
+
+    .mr-team.right {
+        text-align: right;
+    }
+
+    .mr-score {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 1.2rem;
+        color: var(--accent);
+        min-width: 54px;
+        text-align: center;
+    }
+
+    .mr-score.pending {
+        color: var(--text3);
+        font-size: 1rem;
+    }
+
+    .mr-week {
+        font-size: .65rem;
+        color: var(--text3);
+        min-width: 24px;
+        text-align: center;
+    }
+
+    /* ─── DETAIL HEADER ─── */
+    .back-btn {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: .84rem;
+        font-weight: 600;
+        color: var(--text2);
+        cursor: pointer;
+        margin-bottom: 16px;
+        transition: color .13s;
+        background: none;
+        border: none;
+        font-family: 'DM Sans', sans-serif;
+        padding: 0;
+    }
+
+    .back-btn:hover {
+        color: var(--text);
+    }
+
+    .detail-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        gap: 10px;
+    }
+
+    .detail-name {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 1.8rem;
+        letter-spacing: .06em;
+        line-height: 1;
+        margin-bottom: 5px;
+    }
+
+    .detail-meta {
+        font-size: .78rem;
+        color: var(--text2);
+    }
+
+    /* ─── BET FORM ─── */
+    .bet-section {
+        padding: 14px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .bet-title {
+        font-size: .78rem;
+        font-weight: 700;
+        color: var(--text2);
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    .bet-options {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .bet-opt {
+        flex: 1;
+        min-width: 80px;
+        padding: 9px 8px;
+        border-radius: 9px;
+        text-align: center;
+        font-size: .84rem;
+        font-weight: 600;
+        cursor: pointer;
+        background: var(--el);
+        color: var(--text2);
+        border: 1px solid var(--border);
+        font-family: 'DM Sans', sans-serif;
+        transition: all .13s;
+    }
+
+    .bet-opt:hover {
+        border-color: var(--border-hi);
+        color: var(--text);
+    }
+
+    .bet-opt.selected {
+        background: var(--accent-dim);
+        color: var(--accent);
+        border-color: var(--accent-glow);
+    }
+
+    /* ─── RESULTS ─── */
+    .hit {
+        color: var(--accent);
+        font-weight: 700;
+    }
+
+    .miss {
+        color: var(--text3);
+    }
+
+    /* ─── MODAL ─── */
+    .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .8);
+        backdrop-filter: blur(8px);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .modal {
+        background: var(--card);
+        border: 1px solid var(--border-hi);
+        border-radius: 16px;
+        padding: 22px;
+        width: 100%;
+        max-width: 380px;
+    }
+
+    .modal h3 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 1.3rem;
+        letter-spacing: .06em;
+        margin-bottom: 16px;
+    }
+
+    .settings-modal {
+        max-width: 420px;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    /* ─── SPINNER ─── */
+    .spin {
+        width: 28px;
+        height: 28px;
+        border: 3px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin .7s linear infinite;
+        margin: 60px auto;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* ─── EMPTY ─── */
+    .empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text2);
+        font-size: .9rem;
+        line-height: 1.7;
+    }
+
+    .empty-icon {
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+    }
+
+    /* ─── TOAST ─── */
+    .toast {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: var(--el);
+        border: 1px solid var(--border-hi);
+        border-radius: 10px;
+        padding: 10px 18px;
+        font-size: .85rem;
+        font-weight: 600;
+        z-index: 999;
+        transition: transform .25s cubic-bezier(.34, 1.56, .64, 1);
+        white-space: nowrap;
+        color: var(--text);
+    }
+
+    .toast.show {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.success {
+        border-color: var(--accent-glow);
+        color: var(--accent);
+    }
+
+    .toast.error {
+        border-color: rgba(255, 69, 96, .3);
+        color: var(--red);
+    }
