@@ -8,686 +8,311 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:#06080e;--card:#0b1018;--el:#111922;--hover:#16212e;
-      --border:rgba(255,255,255,.06);--border-hi:rgba(255,255,255,.12);
-      --accent:#00e5a0;--accent-dim:rgba(0,229,160,.09);--accent-glow:rgba(0,229,160,.28);
-      --red:#ff4560;--yellow:#ffd230;--blue:#4da6ff;
-      --text:#edf2f7;--text2:#7a8fa3;--text3:#2e404f;
-      --gold:#ffd700;--silver:#c0c0c0;--bronze:#cd7f32;
+      --bg:         #07090f;
+      --card:       #0c1018;
+      --el:         #121b24;
+      --hover:      #18242f;
+      --border:     rgba(255,255,255,.06);
+      --border-hi:  rgba(255,255,255,.11);
+      --accent:     #00e5a0;
+      --accent-dim: rgba(0,229,160,.08);
+      --accent-glow:rgba(0,229,160,.22);
+      --red:        #ff4560;
+      --text:       #edf2f7;
+      --text2:      #6b8094;
+      --text3:      #283848;
+      --gold:       #ffd700;
+      --silver:     #b0bec5;
+      --bronze:     #cd7f32;
+      --nav-h:      52px;
+      --bnav-h:     62px;
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
-    body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 44px,rgba(255,255,255,.005) 44px,rgba(255,255,255,.005) 45px);pointer-events:none}
-    #app{position:relative;z-index:1;min-height:100vh}
 
-    /* NAV */
-    .nav{background:rgba(6,8,14,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 18px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:54px}
-    .nav-brand{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.12em;color:var(--accent);display:flex;align-items:center;gap:6px}
-    .nav-brand span{color:var(--text)}
-    .nav-r{display:flex;align-items:center;gap:8px}
-    .nav-user{font-size:.82rem;color:var(--text2);font-weight:600;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* MAIN */
-    .main{padding:20px 14px 80px;max-width:860px;margin:0 auto}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-    /* NOW BANNER */
-    .now-banner{background:linear-gradient(135deg,rgba(0,229,160,.12),rgba(0,229,160,.04));border:1px solid var(--accent-glow);border-radius:14px;padding:15px 18px;margin-bottom:16px;display:flex;align-items:center;gap:13px;animation:bpulse 3s ease-in-out infinite}
-    @keyframes bpulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,160,.07)}50%{box-shadow:0 0 18px 3px rgba(0,229,160,.11)}}
-    .now-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:ldot 1.4s ease-in-out infinite}
-    @keyframes ldot{0%,100%{opacity:1}50%{opacity:.2}}
-    .now-lbl{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
-    .now-match{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em}
-    .now-sub{font-size:.75rem;color:var(--text2);margin-top:2px}
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--el); border-radius: 99px; }
 
-    /* AUTH */
-    .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-    .auth-glow{position:fixed;top:10%;left:50%;transform:translateX(-50%);width:480px;height:480px;background:radial-gradient(circle,rgba(0,229,160,.05) 0%,transparent 68%);pointer-events:none}
-    .auth-inner{width:100%;max-width:360px}
-    .auth-brand{text-align:center;margin-bottom:28px}
-    .auth-icon{font-size:1.8rem;width:56px;height:56px;background:var(--accent-dim);border:1px solid var(--accent-glow);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+    /* ─── TOP NAV ─── */
+    .nav {
+      background: rgba(7,9,15,.96);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      height: var(--nav-h);
+    }
+    .nav-brand { font-family:'Bebas Neue',sans-serif; font-size:1.45rem; letter-spacing:.12em; color:var(--accent); }
+    .nav-brand span { color: var(--text); }
+    .nav-right { display:flex; align-items:center; gap:8px; }
+    .nav-user  { font-size:.78rem; color:var(--text2); font-weight:600; }
 
-    /* CARD */
-    .card{background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden}
+    /* ─── BOTTOM NAV ─── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(7,9,15,.97);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      height: var(--bnav-h);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .bnav-btn {
+      flex: 1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap: 3px; background:none; border:none; cursor:pointer;
+      color: var(--text3); font-family:'DM Sans',sans-serif;
+      transition: color .13s;
+      padding: 8px 0;
+    }
+    .bnav-btn.active  { color: var(--accent); }
+    .bnav-btn:hover   { color: var(--text2); }
+    .bnav-icon  { font-size: 1.25rem; }
+    .bnav-label { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 
-    /* BUTTONS */
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 16px;border-radius:9px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.855rem;cursor:pointer;border:none;transition:all .14s;white-space:nowrap}
-    .btn:disabled{opacity:.38;cursor:not-allowed}
-    .btn-primary{background:var(--accent);color:#000}
-    .btn-primary:hover:not(:disabled){background:#00ffb3;box-shadow:0 0 22px var(--accent-glow)}
-    .btn-secondary{background:var(--el);color:var(--text);border:1px solid var(--border-hi)}
-    .btn-secondary:hover:not(:disabled){background:var(--hover)}
-    .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
-    .btn-ghost:hover:not(:disabled){color:var(--text);border-color:var(--border-hi)}
-    .btn-danger{background:rgba(255,69,96,.13);color:var(--red);border:1px solid rgba(255,69,96,.27)}
-    .btn-danger:hover:not(:disabled){background:rgba(255,69,96,.23)}
-    .btn-sm{padding:5px 10px;font-size:.78rem}
-    .btn-lg{padding:12px 26px;font-size:.98rem}
-    .btn-full{width:100%}
+    /* ─── MAIN ─── */
+    .main {
+      padding: 18px 14px calc(var(--bnav-h) + 20px);
+      max-width: 820px;
+      margin: 0 auto;
+    }
 
-    /* FORM */
-    .fg{margin-bottom:14px}
-    .fl{display:block;font-size:.74rem;font-weight:700;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
-    .fi{width:100%;background:var(--el);border:1px solid var(--border-hi);border-radius:9px;padding:9px 13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .14s,box-shadow .14s;-webkit-appearance:none}
-    .fi:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,160,.09)}
-    .fi::placeholder{color:var(--text3)}
+    /* ─── BUTTONS ─── */
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:6px;
+      padding:8px 16px; border-radius:9px;
+      font-family:'DM Sans',sans-serif; font-weight:600; font-size:.84rem;
+      cursor:pointer; border:none; transition:all .13s; white-space:nowrap;
+    }
+    .btn:active { transform:scale(.97); }
+    .btn:disabled { opacity:.4; cursor:not-allowed; }
+    .btn-primary   { background:var(--accent); color:#000; }
+    .btn-primary:hover:not(:disabled) { background:#00ffb3; }
+    .btn-secondary { background:var(--el); color:var(--text); border:1px solid var(--border-hi); }
+    .btn-secondary:hover:not(:disabled) { background:var(--hover); }
+    .btn-danger    { background:rgba(255,69,96,.12); color:var(--red); border:1px solid rgba(255,69,96,.25); }
+    .btn-ghost     { background:transparent; color:var(--text2); border:1px solid var(--border); }
+    .btn-ghost:hover { background:var(--el); color:var(--text); }
+    .btn-sm   { padding:5px 11px; font-size:.77rem; }
+    .btn-full { width:100%; }
 
-    /* BADGE */
-    .badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:5px;font-size:.67rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-    .b-green{background:rgba(0,229,160,.13);color:var(--accent)}
-    .b-red{background:rgba(255,69,96,.13);color:var(--red)}
-    .b-yellow{background:rgba(255,210,48,.13);color:var(--yellow)}
-    .b-gray{background:var(--el);color:var(--text2)}
+    /* ─── CARD ─── */
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:14px; }
+    .card-header {
+      padding:11px 14px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+    }
 
-    /* TABS */
-    .tabs{display:flex;gap:3px;background:var(--el);border-radius:11px;padding:3px}
-    .tab{flex:1;padding:7px 5px;text-align:center;font-size:.77rem;font-weight:600;border-radius:8px;cursor:pointer;transition:all .14s;color:var(--text3);border:none;background:none;font-family:'DM Sans',sans-serif}
-    .tab.active{background:var(--card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+    /* ─── FORM ─── */
+    .fi {
+      width:100%; background:var(--el); border:1px solid var(--border-hi);
+      border-radius:9px; padding:10px 13px; color:var(--text);
+      outline:none; font-size:.9rem; font-family:'DM Sans',sans-serif;
+      transition:border-color .13s;
+    }
+    .fi:focus { border-color:var(--accent); }
+    .fi::placeholder { color:var(--text3); }
+    .fi-group { margin-bottom:13px; }
+    .fi-label { font-size:.74rem; font-weight:600; color:var(--text2); margin-bottom:6px; display:block; }
 
-    /* TABLE */
-    .stbl{width:100%;border-collapse:collapse}
-    .stbl th{font-size:.67rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);padding:9px 9px;text-align:center;border-bottom:1px solid var(--border)}
-    .stbl th:nth-child(2){text-align:left}
-    .stbl td{padding:10px 9px;text-align:center;border-bottom:1px solid var(--border);font-size:.87rem}
-    .stbl td:nth-child(2){text-align:left}
-    .stbl tbody tr:hover{background:var(--el)}
-    .stbl tbody tr:last-child td{border-bottom:none}
-    .rb{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:.72rem;font-weight:700}
-    .r1{background:var(--gold);color:#000}.r2{background:var(--silver);color:#000}.r3{background:var(--bronze);color:#000}.r4{background:var(--el);color:var(--text2)}
-    .pc{display:flex;align-items:center;gap:8px}
-    .av{width:28px;height:28px;border-radius:50%;background:var(--el);border:1px solid var(--border-hi);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--accent);flex-shrink:0;text-transform:uppercase}
+    /* ─── LOGIN ─── */
+    .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .login-box  { background:var(--card); border:1px solid var(--border-hi); border-radius:18px; padding:36px 28px; width:100%; max-width:360px; }
+    .login-logo { text-align:center; font-family:'Bebas Neue',sans-serif; font-size:2.2rem; letter-spacing:.14em; color:var(--accent); margin-bottom:6px; }
+    .login-logo span { color:var(--text); }
+    .login-sub  { text-align:center; font-size:.8rem; color:var(--text2); margin-bottom:28px; }
+    .login-err  { background:rgba(255,69,96,.1); border:1px solid rgba(255,69,96,.2); border-radius:8px; padding:9px 12px; font-size:.82rem; color:var(--red); margin-bottom:13px; }
 
-    /* MATCH CARD */
-    .mc{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px 14px;margin-bottom:7px;transition:border-color .14s}
-    .mc:hover{border-color:var(--border-hi)}
-    .mc.next{border-color:rgba(255,210,48,.35);background:rgba(255,210,48,.03)}
-    .mc.done{border-color:rgba(0,229,160,.18)}
-    .mr{display:flex;align-items:center;gap:6px}
-    .mt{flex:1;text-align:center}
-    .mn{font-weight:600;font-size:.87rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .msc{display:flex;align-items:center;gap:3px;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;min-width:76px;justify-content:center}
-    .msc-sep{color:var(--text3);font-size:1.1rem}
-    .mvs{font-family:'Bebas Neue',sans-serif;font-size:.88rem;color:var(--text3);letter-spacing:.1em;min-width:76px;text-align:center}
-    .mact{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
-    .apv-row{display:flex;align-items:center;justify-content:center;gap:7px}
-    .apv-d{width:7px;height:7px;border-radius:50%;background:var(--el);border:1px solid var(--border-hi);display:inline-block}
-    .apv-d.ok{background:var(--accent)}
+    /* ─── SEC LABEL ─── */
+    .sec-label {
+      font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
+      color:var(--text2); margin-bottom:10px; margin-top:22px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .sec-label:first-child { margin-top:0; }
 
-    /* MODAL */
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(7px);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .14s ease}
-    .overlay.hidden{display:none}
-    @media(min-width:580px){.overlay{align-items:center;padding:20px}}
-    .modal{background:var(--card);border:1px solid var(--border-hi);border-radius:20px 20px 0 0;padding:22px 18px 34px;width:100%;max-width:440px;animation:slideUp .18s ease;max-height:90vh;overflow-y:auto}
-    @media(min-width:580px){.modal{border-radius:16px}}
-    .modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:.08em;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+    /* ─── TOURNAMENT CARDS ─── */
+    .t-card {
+      background:var(--card); border:1px solid var(--border); border-radius:12px;
+      padding:14px; margin-bottom:9px;
+      display:flex; align-items:center; justify-content:space-between;
+      cursor:pointer; transition:all .14s; position:relative; overflow:hidden;
+    }
+    .t-card::before { content:''; position:absolute; left:0;top:0;bottom:0; width:3px; background:var(--accent); opacity:0; transition:opacity .14s; }
+    .t-card.active-t::before { opacity:1; }
+    .t-card:hover { background:var(--hover); border-color:var(--border-hi); }
+    .t-card-name { font-weight:700; font-size:.95rem; margin-bottom:3px; }
+    .t-card-meta { font-size:.75rem; color:var(--text2); }
+    .t-badge { font-size:.65rem; font-weight:700; padding:3px 8px; border-radius:5px; text-transform:uppercase; }
+    .t-badge.active { background:var(--accent-dim); color:var(--accent); border:1px solid var(--accent-glow); }
+    .t-badge.done   { background:var(--el); color:var(--text2); border:1px solid var(--border); }
 
-    /* STATS */
-    .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(94px,1fr));gap:7px}
-    .sb{background:var(--el);border:1px solid var(--border);border-radius:10px;padding:13px 10px;text-align:center}
-    .sv{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--accent);line-height:1}
-    .sl{font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-top:3px}
+    /* ─── STANDINGS TABLE ─── */
+    .stbl { width:100%; border-collapse:collapse; }
+    .stbl th { font-size:.63rem; font-weight:700; color:var(--text3); padding:9px 8px; text-align:center; border-bottom:1px solid var(--border); text-transform:uppercase; letter-spacing:.06em; }
+    .stbl td { padding:10px 8px; text-align:center; border-bottom:1px solid var(--border); font-size:.86rem; }
+    .stbl tr:last-child td { border-bottom:none; }
+    .stbl tr:hover td { background:var(--el); }
+    .stbl td.pl-name { text-align:left; font-weight:600; padding-left:12px; }
+    .rank-1 { color:var(--gold); }
+    .rank-2 { color:var(--silver); }
+    .rank-3 { color:var(--bronze); }
 
-    /* MISC */
-    .sec{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em;margin-bottom:9px;display:flex;align-items:center;gap:7px}
-    .sec::after{content:'';flex:1;height:1px;background:var(--border)}
-    .empty{text-align:center;padding:38px 20px;color:var(--text3)}
-    .alert{padding:10px 14px;border-radius:9px;font-size:.84rem;margin-bottom:13px}
-    .a-err{background:rgba(255,69,96,.1);border:1px solid rgba(255,69,96,.27);color:var(--red)}
-    .a-ok{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.27);color:var(--accent)}
-    .a-info{background:rgba(77,166,255,.1);border:1px solid rgba(77,166,255,.27);color:var(--blue)}
-    .a-warn{background:rgba(255,210,48,.1);border:1px solid rgba(255,210,48,.27);color:var(--yellow)}
-    .spin-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
-    .spin{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:_spin .7s linear infinite}
-    .g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-    .hidden{display:none!important}
-    .mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}
+    /* ─── NEXT MATCH ─── */
+    .next-match { display:flex; align-items:center; justify-content:space-between; padding:18px 14px; gap:10px; }
+    .nm-team    { flex:1; text-align:center; font-weight:700; font-size:.95rem; }
+    .nm-vs      { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; color:var(--accent); padding:0 10px; letter-spacing:.08em; }
+    .nm-slot    { font-size:.72rem; color:var(--text2); text-align:center; padding:0 14px 12px; }
 
-    /* ROUND */
-    .rh{display:flex;align-items:center;gap:10px;margin:16px 0 9px}
-    .rl{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.1em;color:var(--text2)}
-    .rline{flex:1;height:1px;background:var(--border)}
+    /* ─── FIXTURE ─── */
+    .match-row { display:flex; align-items:center; padding:11px 13px; border-bottom:1px solid var(--border); gap:8px; cursor:pointer; transition:background .12s; }
+    .match-row:last-child { border-bottom:none; }
+    .match-row:hover { background:var(--el); }
+    .match-row.done-match { opacity:.75; }
+    .mr-team   { flex:1; font-size:.88rem; font-weight:600; }
+    .mr-team.right { text-align:right; }
+    .mr-score  { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; color:var(--accent); min-width:54px; text-align:center; }
+    .mr-score.pending { color:var(--text3); font-size:1rem; }
+    .mr-week   { font-size:.65rem; color:var(--text3); min-width:24px; text-align:center; }
 
-    /* SETUP */
-    .setup-wrap{text-align:center;padding:30px 0}
-    .setup-icon{font-size:2.8rem;margin-bottom:12px}
-    .setup-title{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:.08em;margin-bottom:6px}
-    .setup-sub{font-size:.87rem;color:var(--text2);margin-bottom:22px}
-    .pg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-    .ps{background:var(--el);border:1px solid var(--border-hi);border-radius:10px;padding:9px 11px;display:flex;align-items:center;gap:7px}
-    .ps.filled{border-color:var(--accent-glow);background:rgba(0,229,160,.05)}
-    .pn{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--text3);width:18px;text-align:center;flex-shrink:0}
+    /* ─── DETAIL HEADER ─── */
+    .back-btn { display:flex; align-items:center; gap:7px; font-size:.84rem; font-weight:600; color:var(--text2); cursor:pointer; margin-bottom:16px; transition:color .13s; background:none; border:none; font-family:'DM Sans',sans-serif; padding:0; }
+    .back-btn:hover { color:var(--text); }
+    .detail-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:18px; gap:10px; }
+    .detail-name   { font-family:'Bebas Neue',sans-serif; font-size:1.8rem; letter-spacing:.06em; line-height:1; margin-bottom:5px; }
+    .detail-meta   { font-size:.78rem; color:var(--text2); }
 
-    /* FORM DOTS */
-    .fb{display:flex;justify-content:center;gap:3px}
-    .fw{width:7px;height:7px;border-radius:2px;background:var(--accent)}
-    .fd{width:7px;height:7px;border-radius:2px;background:var(--yellow)}
-    .fll{width:7px;height:7px;border-radius:2px;background:var(--red)}
+    /* ─── BET FORM ─── */
+    .bet-section { padding:14px; border-bottom:1px solid var(--border); }
+    .bet-title   { font-size:.78rem; font-weight:700; color:var(--text2); margin-bottom:10px; text-transform:uppercase; letter-spacing:.06em; }
+    .bet-options { display:flex; gap:8px; flex-wrap:wrap; }
+    .bet-opt {
+      flex:1; min-width:80px; padding:9px 8px; border-radius:9px; text-align:center;
+      font-size:.84rem; font-weight:600; cursor:pointer;
+      background:var(--el); color:var(--text2); border:1px solid var(--border);
+      font-family:'DM Sans',sans-serif; transition:all .13s;
+    }
+    .bet-opt:hover    { border-color:var(--border-hi); color:var(--text); }
+    .bet-opt.selected { background:var(--accent-dim); color:var(--accent); border-color:var(--accent-glow); }
 
-    @keyframes _spin{to{transform:rotate(360deg)}}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:2px}
+    /* ─── RESULTS ─── */
+    .hit  { color:var(--accent); font-weight:700; }
+    .miss { color:var(--text3); }
+
+    /* ─── MODAL ─── */
+    .overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); backdrop-filter:blur(8px); z-index:200; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .hidden  { display:none!important; }
+    .modal   { background:var(--card); border:1px solid var(--border-hi); border-radius:16px; padding:22px; width:100%; max-width:380px; }
+    .modal h3 { font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:.06em; margin-bottom:16px; }
+    .settings-modal { max-width:420px; max-height:85vh; overflow-y:auto; }
+
+    /* ─── SPINNER ─── */
+    .spin { width:28px;height:28px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; margin:60px auto; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ─── EMPTY ─── */
+    .empty { text-align:center; padding:40px 20px; color:var(--text2); font-size:.9rem; line-height:1.7; }
+    .empty-icon { font-size:2.2rem; margin-bottom:10px; }
+
+    /* ─── TOAST ─── */
+    .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--el); border:1px solid var(--border-hi); border-radius:10px; padding:10px 18px; font-size:.85rem; font-weight:600; z-index:999; transition:transform .25s cubic-bezier(.34,1.56,.64,1); white-space:nowrap; color:var(--text); }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+    .toast.success { border-color:var(--accent-glow); color:var(--accent); }
+    .toast.error   { border-color:rgba(255,69,96,.3); color:var(--red); }
   </style>
 </head>
 <body>
-<div id="app"><div class="spin-wrap"><div class="spin"></div></div></div>
+
+<div id="root"></div>
 <div class="overlay hidden" id="modal-overlay"></div>
+<div class="toast" id="toast"></div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  signOut, onAuthStateChanged, updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getFirestore, doc, setDoc, getDoc, updateDoc,
-  collection, query, where, serverTimestamp, onSnapshot, addDoc, getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { state, loadSession, clearSession, saveSession } from './js/app.js';
+import { db } from './js/app.js';
+import { renderLogin } from './js/auth.js';
+import { renderTournaments } from './js/tournaments.js';
+import { renderDetail } from './js/detail.js';
+import { renderBets, renderResults } from './js/bets.js';
+import { openSettings } from './js/settings.js';
+import { renderTopNav, renderNav, showToast } from './js/ui.js';
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const cfg={apiKey:"AIzaSyCII19pXF_SLL2Tkjw3FeaPxYHNQ_b3J_Q",authDomain:"turnuva-kaeru.firebaseapp.com",projectId:"turnuva-kaeru",storageBucket:"turnuva-kaeru.firebasestorage.app",messagingSenderId:"2078204583",appId:"1:2078204583:web:2c83665f82417e3e843182"};
-const fb=initializeApp(cfg), auth=getAuth(fb), db=getFirestore(fb);
-const TID='main'; // single tournament doc
+// ─── ROUTER ───
+function navigate(page, id = null) {
+  state.page = page;
 
-let me=null, myProfile=null, tournament=null, matches=[], currentTab='standings';
-let unsubT=null, unsubM=null;
+  // Detail sayfası dışında listener'ları temizle
+  if (page !== 'detail') {
+    state.unsub.forEach(u => u()); state.unsub = [];
+    state.tourney = null; state.matches = [];
+  }
 
-// ── BOOT ──────────────────────────────────────────────────────────────────
-onAuthStateChanged(auth, async user=>{
-  me=user;
-  if(user){ const s=await getDoc(doc(db,'users',user.uid)); myProfile=s.exists()?s.data():{uid:user.uid,username:user.displayName||'?'}; }
-  renderApp();
-});
+  renderShell();
 
-function renderApp(){
-  const el=document.getElementById('app');
-  if(!me){el.innerHTML=renderAuth();bindAuth();return;}
-  el.innerHTML=`
-  <nav class="nav">
-    <div class="nav-brand">⚽ <span>PES</span> LİGİ</div>
-    <div class="nav-r">
-      <span class="nav-user" id="nav-uname">${myProfile?.username||'?'}</span>
-      <button class="btn btn-ghost btn-sm" id="btn-rename">✏️</button>
-      <button class="btn btn-ghost btn-sm" id="btn-logout">Çıkış</button>
-    </div>
-  </nav>
-  <main class="main" id="main"></main>`;
-  document.getElementById('btn-logout').onclick=()=>{cleanup();signOut(auth);};
-  document.getElementById('btn-rename').onclick=showRenameModal;
-  subscribeAll();
+  if      (page === 'tournaments') renderTournaments(navigate);
+  else if (page === 'detail')      renderDetail(id, navigate);
+  else if (page === 'bets')        renderBets();
+  else if (page === 'results')     renderResults();
+
+  // Bottom nav aktif sekme
+  document.querySelectorAll('.bnav-btn').forEach(btn => {
+    const p = btn.dataset.page;
+    btn.classList.toggle('active', p === page || (page === 'detail' && p === 'tournaments'));
+  });
 }
 
-function cleanup(){ unsubT?.();unsubT=null; unsubM?.();unsubM=null; }
+function renderShell() {
+  document.getElementById('root').innerHTML = `
+    ${renderTopNav(state.user.username)}
+    <main class="main" id="main"></main>
+    ${renderNav(state.page)}
+  `;
 
-// ── AUTH ──────────────────────────────────────────────────────────────────
-function renderAuth(){
-  return `<div class="auth-wrap"><div class="auth-glow"></div><div class="auth-inner">
-    <div class="auth-brand"><div class="auth-icon">🏆</div>
-      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:2.3rem;letter-spacing:.06em">PES <span style="color:var(--accent)">LİGİ</span></h1>
-      <p style="color:var(--text2);font-size:.85rem;margin-top:5px">Kanka turnuvası</p>
-    </div>
-    <div class="card"><div style="padding:22px">
-      <div id="aerr"></div>
-      <div class="fg"><label class="fl">Kullanıcı Adı</label><input class="fi" id="fu" placeholder="adın" autocomplete="username"/></div>
-      <div class="fg" style="margin-bottom:18px"><label class="fl">Şifre</label><input class="fi" id="fp" type="password" placeholder="••••••" autocomplete="current-password"/></div>
-      <button class="btn btn-primary btn-full btn-lg" id="abtn">Giriş Yap</button>
-      <p style="color:var(--text2);font-size:.82rem;text-align:center;margin-top:11px">Hesabın yoksa otomatik oluşur</p>
-    </div></div>
-  </div></div>`;
-}
-function bindAuth(){
-  const go=async()=>{
-    const e=document.getElementById('aerr'); e.innerHTML='';
-    const u=document.getElementById('fu').value.trim().toLowerCase();
-    const p=document.getElementById('fp').value;
-    const btn=document.getElementById('abtn');
-    if(!u||!p){e.innerHTML='<div class="alert a-err">Ad ve şifre gir</div>';return;}
-    btn.disabled=true;btn.textContent='Bekle...';
-    try{
-      try{await signInWithEmailAndPassword(auth,`${u}@pes.local`,p);}
-      catch(err){
-        if(['auth/user-not-found','auth/invalid-credential','auth/invalid-email'].includes(err.code)){
-          const r=await createUserWithEmailAndPassword(auth,`${u}@pes.local`,p);
-          await updateProfile(r.user,{displayName:u});
-          await setDoc(doc(db,'users',r.user.uid),{uid:r.user.uid,username:u,createdAt:new Date()});
-        }else throw err;
-      }
-    }catch(err){
-      const m={'auth/wrong-password':'Şifre yanlış','auth/weak-password':'En az 6 karakter','auth/too-many-requests':'Çok fazla deneme'};
-      e.innerHTML=`<div class="alert a-err">${m[err.code]||err.message}</div>`;
-      btn.disabled=false;btn.textContent='Giriş Yap';
-    }
+  document.getElementById('btn-settings-nav').onclick = () => openSettings(navigate);
+  document.getElementById('btn-logout').onclick = () => {
+    clearSession(); state.user = null;
+    state.unsub.forEach(u => u()); state.unsub = [];
+    renderLogin(onLoginSuccess);
   };
-  document.getElementById('abtn').addEventListener('click',go);
-  document.getElementById('fp').addEventListener('keydown',e=>e.key==='Enter'&&go());
-}
 
-// ── SUBSCRIBE ─────────────────────────────────────────────────────────────
-function subscribeAll(){
-  unsubT=onSnapshot(doc(db,'tournaments',TID),s=>{
-    tournament=s.exists()?{id:s.id,...s.data()}:null;
-    render();
-  });
-  unsubM=onSnapshot(query(collection(db,'matches'),where('tournamentId','==',TID)),s=>{
-    matches=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.slot-b.slot));
-    render();
+  document.querySelectorAll('.bnav-btn').forEach(btn => {
+    btn.onclick = () => {
+      const p = btn.dataset.page;
+      if (p !== state.page) navigate(p);
+    };
   });
 }
 
-// ── MAIN RENDER ───────────────────────────────────────────────────────────
-function render(){
-  const main=document.getElementById('main');if(!main)return;
-  if(!tournament){main.innerHTML=renderSetup();bindSetup();return;}
+function onLoginSuccess() { navigate('tournaments'); }
 
-  const next=getNext();
-  let html='';
-  if(next){
-    const isWaiting=next.status==='submitted'||next.status==='disputed';
-    html+=`<div class="now-banner">
-      <div class="now-dot"></div>
-      <div>
-        <div class="now-lbl">${isWaiting?'Onay Bekliyor':'Şimdi Oynanacak'}</div>
-        <div class="now-match">${next.homeName} <span style="color:var(--text2)">vs</span> ${next.awayName}</div>
-        <div class="now-sub">${next.round===1?'1. Tur':'2. Tur (Rövanş)'} · Hafta ${next.roundSlot}
-          ${isWaiting?`<span class="badge b-yellow" style="margin-left:6px">${(next.approvals?.length||0)}/2 onay</span>`:''}
-        </div>
-      </div>
-    </div>`;
-  } else if(matches.length && matches.every(m=>m.status==='confirmed')){
-    const rows=calcStandings();
-    html+=`<div class="now-banner" style="background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.03));border-color:rgba(255,215,0,.3)">
-      <div style="font-size:1.5rem">🏆</div>
-      <div>
-        <div class="now-lbl" style="color:var(--gold)">Turnuva Bitti!</div>
-        <div class="now-match">${rows[0]?.username||'?'} şampiyon!</div>
-        <div class="now-sub">${rows[0]?.pts||0} puan · ${rows[0]?.won||0} galibiyet</div>
-      </div>
-    </div>`;
+// ─── BOOT ───
+async function boot() {
+  const session = loadSession();
+  if (session) {
+    try {
+      const snap = await getDoc(doc(db, 'users', session.username));
+      if (snap.exists()) {
+        state.user = { username: session.username, ...snap.data() };
+        navigate('tournaments');
+        return;
+      }
+    } catch(e) {}
   }
-
-  html+=`<div class="tabs mb-12" id="tabs">
-    <button class="tab ${currentTab==='standings'?'active':''}" data-tab="standings">Puan Tablosu</button>
-    <button class="tab ${currentTab==='fixtures'?'active':''}" data-tab="fixtures">Maçlar</button>
-    <button class="tab ${currentTab==='stats'?'active':''}" data-tab="stats">İstatistikler</button>
-  </div>
-  <div id="tb"></div>`;
-  main.innerHTML=html;
-  document.getElementById('tabs').addEventListener('click',e=>{
-    const t=e.target.closest('.tab');if(!t)return;
-    currentTab=t.dataset.tab;
-    document.querySelectorAll('#tabs .tab').forEach(b=>b.classList.toggle('active',b===t));
-    renderTab();
-  });
-  renderTab();
+  renderLogin(onLoginSuccess);
 }
 
-function renderTab(){
-  const el=document.getElementById('tb');if(!el)return;
-  if(currentTab==='standings')el.innerHTML=renderStandings();
-  else if(currentTab==='fixtures'){el.innerHTML=renderFixtures();bindFixtures();}
-  else el.innerHTML=renderStats();
-}
-
-// ── SETUP ─────────────────────────────────────────────────────────────────
-function renderSetup(){
-  return `<div class="setup-wrap">
-    <div class="setup-icon">⚽</div>
-    <h2 class="setup-title">Ligi Kur</h2>
-    <p class="setup-sub">4 oyuncunun adını gir. Fikstür otomatik oluşur.<br>Herkes herkesle 2 maç (rövanşlı).</p>
-    <div class="card" style="text-align:left"><div style="padding:20px">
-      <div id="serr"></div>
-      <div class="fg mb-12">
-        <label class="fl">Lig Adı</label>
-        <input class="fi" id="lname" placeholder="PES Ligi 2025"/>
-      </div>
-      <div class="pg">
-        ${[1,2,3,4].map(i=>`<div class="ps" id="slot${i}">
-          <span class="pn">${i}</span>
-          <input class="fi" id="p${i}" placeholder="oyuncu${i}" style="border:none;background:transparent;padding:0;font-size:.88rem;font-weight:600"/>
-        </div>`).join('')}
-      </div>
-      <div class="alert a-info mb-16" style="font-size:.79rem">
-        ℹ️ <b>1. Tur:</b> A-B, C-D, A-C, B-D, A-D, B-C<br>
-        <b>2. Tur:</b> Rövanş (ev/deplasman ters)
-      </div>
-      <button class="btn btn-primary btn-full btn-lg" id="bcreate">🚀 Ligi Başlat</button>
-    </div></div>
-  </div>`;
-}
-function bindSetup(){
-  // Pre-fill slot 1
-  const p1=document.getElementById('p1');
-  if(p1){p1.value=myProfile?.username||'';p1.readOnly=true;p1.style.opacity='.6';}
-  document.getElementById('p1')?.closest('.ps')?.classList.add('filled');
-
-  // Highlight filled slots
-  [2,3,4].forEach(i=>{
-    document.getElementById(`p${i}`)?.addEventListener('input',function(){
-      this.closest('.ps').classList.toggle('filled',!!this.value.trim());
-    });
-  });
-
-  document.getElementById('bcreate').addEventListener('click',async()=>{
-    const err=document.getElementById('serr');err.innerHTML='';
-    const names=[1,2,3,4].map(i=>document.getElementById(`p${i}`).value.trim());
-    if(names.some(n=>!n)){err.innerHTML='<div class="alert a-err">4 oyuncunun adını gir</div>';return;}
-    if(new Set(names.map(n=>n.toLowerCase())).size<4){err.innerHTML='<div class="alert a-err">Oyuncu adları farklı olmalı</div>';return;}
-    const lname=document.getElementById('lname').value.trim()||'PES Ligi';
-    const btn=document.getElementById('bcreate');
-    btn.disabled=true;btn.textContent='Oluşturuluyor...';
-    try{
-      const players=[
-        {uid:me.uid,username:names[0]},
-        {uid:'p2_'+names[1].toLowerCase(),username:names[1]},
-        {uid:'p3_'+names[2].toLowerCase(),username:names[2]},
-        {uid:'p4_'+names[3].toLowerCase(),username:names[3]},
-      ];
-      await setDoc(doc(db,'tournaments',TID),{name:lname,status:'active',players,createdAt:serverTimestamp(),createdBy:me.uid});
-      await generateFixture(players);
-    }catch(e){err.innerHTML=`<div class="alert a-err">${e.message}</div>`;btn.disabled=false;btn.textContent='🚀 Ligi Başlat';}
-  });
-}
-
-// ── FIXTURE GENERATION ────────────────────────────────────────────────────
-// 4-team round-robin rotation: fix player[0], rotate the rest
-// Produces 3 rounds of 2 matches each (6 matches total per leg, 12 total with rövanş)
-// Round structure:
-//   Week 1: 0v1, 2v3
-//   Week 2: 0v2, 3v1  (rotate: [0,2,3,1])
-//   Week 3: 0v3, 1v2  (rotate: [0,3,1,2])
-async function generateFixture(players){
-  // rotation schedule (indices into players array)
-  const weeks=[
-    [[0,1],[2,3]],   // week 1
-    [[0,2],[3,1]],   // week 2
-    [[0,3],[1,2]],   // week 3
-  ];
-  const docs=[];
-  let slot=1;
-  // Round 1
-  for(let wi=0;wi<weeks.length;wi++){
-    for(let mi=0;mi<weeks[wi].length;mi++){
-      const [hi,ai]=weeks[wi][mi];
-      docs.push({round:1,roundSlot:wi+1,slot,homeIdx:hi,awayIdx:ai});
-      slot++;
-    }
-  }
-  // Round 2 — rövanş (swap home/away)
-  for(let wi=0;wi<weeks.length;wi++){
-    for(let mi=0;mi<weeks[wi].length;mi++){
-      const [hi,ai]=weeks[wi][mi];
-      docs.push({round:2,roundSlot:wi+1,slot,homeIdx:ai,awayIdx:hi});
-      slot++;
-    }
-  }
-  await Promise.all(docs.map(d=>addDoc(collection(db,'matches'),{
-    tournamentId:TID, round:d.round, roundSlot:d.roundSlot, slot:d.slot,
-    homeUid:players[d.homeIdx].uid, homeName:players[d.homeIdx].username,
-    awayUid:players[d.awayIdx].uid, awayName:players[d.awayIdx].username,
-    status:'pending', homeGoals:null, awayGoals:null,
-    homeRedCards:0, awayRedCards:0, submittedBy:null, approvals:[],
-    createdAt:serverTimestamp()
-  })));
-}
-
-// ── NEXT MATCH ────────────────────────────────────────────────────────────
-function getNext(){
-  const sub=matches.find(m=>m.status==='submitted'||m.status==='disputed');
-  if(sub)return sub;
-  return matches.find(m=>m.status==='pending');
-}
-
-// ── STANDINGS ─────────────────────────────────────────────────────────────
-function calcStandings(){
-  if(!tournament?.players)return[];
-  const t={};
-  tournament.players.forEach(p=>{t[p.uid]={uid:p.uid,username:p.username,played:0,won:0,drawn:0,lost:0,gf:0,ga:0,rc:0,pts:0,form:[]};});
-  [...matches].filter(m=>m.status==='confirmed').sort((a,b)=>a.slot-b.slot).forEach(m=>{
-    const h=t[m.homeUid],a=t[m.awayUid];if(!h||!a)return;
-    h.played++;a.played++;h.gf+=m.homeGoals;h.ga+=m.awayGoals;a.gf+=m.awayGoals;a.ga+=m.homeGoals;
-    h.rc+=m.homeRedCards||0;a.rc+=m.awayRedCards||0;
-    if(m.homeGoals>m.awayGoals){h.won++;h.pts+=3;a.lost++;h.form.push('W');a.form.push('L');}
-    else if(m.awayGoals>m.homeGoals){a.won++;a.pts+=3;h.lost++;h.form.push('L');a.form.push('W');}
-    else{h.drawn++;h.pts++;a.drawn++;a.pts++;h.form.push('D');a.form.push('D');}
-  });
-  return Object.values(t).map(p=>({...p,av:p.gf-p.ga})).sort((a,b)=>b.pts-a.pts||b.av-a.av||b.gf-a.gf);
-}
-
-function renderStandings(){
-  const rows=calcStandings();
-  if(!rows.length)return`<div class="empty"><p>Yükleniyor...</p></div>`;
-  const rc=['r1','r2','r3','r4'];
-  return `<div class="card">
-    <table class="stbl">
-      <thead><tr><th>#</th><th>Oyuncu</th><th>O</th><th>G</th><th>B</th><th>M</th><th>AG</th><th>YG</th><th>AV</th><th>🟥</th><th>Form</th><th>P</th></tr></thead>
-      <tbody>${rows.map((p,i)=>{
-        const form=(p.form||[]).slice(-5).map(r=>`<div class="${r==='W'?'fw':r==='D'?'fd':'fll'}"></div>`).join('');
-        return `<tr>
-          <td><span class="rb ${rc[i]||'r4'}">${i+1}</span></td>
-          <td><div class="pc"><div class="av">${p.username[0]}</div>${p.username}</div></td>
-          <td>${p.played}</td><td>${p.won}</td><td>${p.drawn}</td><td>${p.lost}</td>
-          <td>${p.gf}</td><td>${p.ga}</td>
-          <td style="color:${p.av>=0?'var(--accent)':'var(--red)'}">${p.av>0?'+':''}${p.av}</td>
-          <td style="color:var(--red)">${p.rc}</td>
-          <td><div class="fb">${form}</div></td>
-          <td style="font-weight:700;color:var(--accent)">${p.pts}</td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table>
-  </div>
-  <div style="margin-top:7px;font-size:.71rem;color:var(--text3);text-align:center">O=Oyun G=Galibiyet B=Beraberlik M=Mağlubiyet AV=Averaj P=Puan</div>`;
-}
-
-// ── FIXTURES ──────────────────────────────────────────────────────────────
-function renderFixtures(){
-  if(!matches.length)return`<div class="empty"><p>Maçlar yükleniyor...</p></div>`;
-  const r1=matches.filter(m=>m.round===1), r2=matches.filter(m=>m.round===2);
-  return renderRound('1. TUR',r1)+renderRound('2. TUR — RÖVANŞ',r2);
-}
-
-function renderRound(label,rmatches){
-  const done=rmatches.filter(m=>m.status==='confirmed').length;
-  const total=rmatches.length;
-  let html=`<div class="rh">
-    <span class="rl">${label}</span>
-    <span class="badge ${done===total&&total>0?'b-green':'b-gray'}">${done}/${total}</span>
-    <div class="rline"></div>
-  </div>`;
-  // Group by roundSlot
-  const slots={};
-  rmatches.forEach(m=>{if(!slots[m.roundSlot])slots[m.roundSlot]=[];slots[m.roundSlot].push(m);});
-  for(const sl of Object.keys(slots).sort((a,b)=>+a-+b)){
-    const pair=slots[sl];
-    html+=`<div style="background:var(--el);border-radius:12px;padding:10px;margin-bottom:10px;border:1px solid var(--border)">
-      <div style="font-size:.71rem;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">HAFTA ${sl}</div>
-      ${pair.sort((a,b)=>a.slot-b.slot).map(m=>renderMC(m)).join('')}
-    </div>`;
-  }
-  return html;
-}
-
-function renderMC(m){
-  const next=getNext();
-  const isNext=next?.id===m.id;
-  const players=tournament?.players||[];
-  const myApproved=m.approvals?.includes(me?.uid);
-  const approvalCount=m.approvals?.length||0;
-  let scoreHtml=m.status==='pending'?`<div class="mvs">VS</div>`:
-    `<div class="msc">${m.homeGoals??'-'}<span class="msc-sep">-</span>${m.awayGoals??'-'}</div>`;
-  const statusBadge=m.status==='confirmed'?`<span class="badge b-green">✓ Onaylandı</span>`:
-    m.status==='submitted'?`<span class="badge b-yellow">Onay Bekliyor</span>`:
-    m.status==='disputed'?`<span class="badge b-red">⚠️ İtiraz</span>`:'';
-  let actions='';
-  if(m.status==='pending'){
-    actions=`<div class="mact"><button class="btn btn-primary btn-sm" data-action="score" data-id="${m.id}">⚽ Skor Gir</button></div>`;
-  } else if(m.status==='submitted'||m.status==='disputed'){
-    const dots=players.map(p=>`<span class="apv-d ${m.approvals?.includes(p.uid)?'ok':''}" title="${p.username}"></span>`).join('');
-    actions=`<div class="mact" style="flex-direction:column;gap:7px">
-      <div style="font-size:.73rem;color:var(--text2)"><b>${approvalCount}</b>/2 onay</div>
-      <div class="apv-row">${dots}</div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center">
-        ${!myApproved?`<button class="btn btn-primary btn-sm" data-action="approve" data-id="${m.id}">✓ Onayla</button>`:`<span class="badge b-green">Onayladın ✓</span>`}
-        <button class="btn btn-ghost btn-sm" data-action="edit" data-id="${m.id}">Düzenle</button>
-        <button class="btn btn-danger btn-sm" data-action="dispute" data-id="${m.id}">⚠️ İtiraz</button>
-      </div>
-    </div>`;
-  }
-  const rcRow=(m.homeRedCards||m.awayRedCards)&&m.status!=='pending'?
-    `<div style="display:flex;gap:10px;justify-content:center;font-size:.74rem;color:var(--text2);margin-top:5px"><span>🟥 ${m.homeName}: ${m.homeRedCards}</span><span>🟥 ${m.awayName}: ${m.awayRedCards}</span></div>`:'';
-  return `<div class="mc ${isNext&&m.status!=='confirmed'?'next':''} ${m.status==='confirmed'?'done':''}">
-    <div class="mr">
-      <div class="mt"><div class="mn">${m.homeName}</div></div>
-      ${scoreHtml}
-      <div class="mt"><div class="mn">${m.awayName}</div></div>
-    </div>
-    ${rcRow}
-    ${statusBadge?`<div style="text-align:center;margin-top:6px">${statusBadge}</div>`:''}
-    ${actions}
-  </div>`;
-}
-
-function bindFixtures(){
-  document.getElementById('tb')?.addEventListener('click',async e=>{
-    const btn=e.target.closest('[data-action]');if(!btn)return;
-    const {action,id}=btn.dataset;
-    const m=matches.find(x=>x.id===id);if(!m)return;
-    if(action==='score'||action==='edit')showScoreModal(m);
-    if(action==='approve')await doApprove(m);
-    if(action==='dispute')await doDispute(m);
-  });
-}
-
-// ── SCORE MODAL ───────────────────────────────────────────────────────────
-function showScoreModal(m){
-  const o=document.getElementById('modal-overlay');
-  o.innerHTML=`<div class="modal">
-    <div class="modal-title">⚽ Skor Gir <button class="btn btn-ghost btn-sm" id="mc">✕</button></div>
-    <div id="merr"></div>
-    <div style="font-size:.8rem;color:var(--text2);margin-bottom:14px;font-weight:600">${m.round===1?'1. TUR':'2. TUR (RÖVANŞ)'} · HAFTA ${m.roundSlot}</div>
-    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-bottom:14px">
-      <div class="fg" style="margin-bottom:0">
-        <label class="fl">${m.homeName}</label>
-        <input class="fi" id="hg" type="number" min="0" max="99" value="${m.homeGoals??''}" placeholder="0" style="text-align:center;font-size:1.5rem;font-family:'Bebas Neue'"/>
-      </div>
-      <div style="padding-bottom:5px;color:var(--text3);font-family:'Bebas Neue';font-size:1.3rem">—</div>
-      <div class="fg" style="margin-bottom:0">
-        <label class="fl">${m.awayName}</label>
-        <input class="fi" id="ag" type="number" min="0" max="99" value="${m.awayGoals??''}" placeholder="0" style="text-align:center;font-size:1.5rem;font-family:'Bebas Neue'"/>
-      </div>
-    </div>
-    <div style="background:var(--el);border-radius:10px;padding:13px;margin-bottom:14px">
-      <div style="font-size:.69rem;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:9px">🟥 Kırmızı Kartlar</div>
-      <div class="g2">
-        <div><label class="fl" style="font-size:.68rem">${m.homeName}</label><input class="fi" id="hr" type="number" min="0" max="11" value="${m.homeRedCards||0}" style="text-align:center"/></div>
-        <div><label class="fl" style="font-size:.68rem">${m.awayName}</label><input class="fi" id="ar" type="number" min="0" max="11" value="${m.awayRedCards||0}" style="text-align:center"/></div>
-      </div>
-    </div>
-    <div class="alert a-info mb-12" style="font-size:.77rem">ℹ️ 2 kişinin onayı gerekiyor. Herkes onaylayabilir.</div>
-    <button class="btn btn-primary btn-full" id="msub">Sonucu Gönder</button>
-  </div>`;
-  o.classList.remove('hidden');
-  o.querySelector('#mc').onclick=()=>o.classList.add('hidden');
-  o.addEventListener('click',e=>{if(e.target===o)o.classList.add('hidden');});
-  o.querySelector('#msub').addEventListener('click',async()=>{
-    const errEl=document.getElementById('merr');errEl.innerHTML='';
-    const hg=document.getElementById('hg').value,ag=document.getElementById('ag').value;
-    if(hg===''||ag===''){errEl.innerHTML='<div class="alert a-err">İki skoru gir</div>';return;}
-    const btn=document.getElementById('msub');btn.disabled=true;btn.textContent='Gönderiliyor...';
-    try{
-      await updateDoc(doc(db,'matches',m.id),{
-        status:'submitted',homeGoals:+hg,awayGoals:+ag,
-        homeRedCards:+document.getElementById('hr').value||0,
-        awayRedCards:+document.getElementById('ar').value||0,
-        submittedBy:me.uid,submittedAt:serverTimestamp(),
-        approvals:[me.uid]
-      });
-      o.classList.add('hidden');
-    }catch(e){errEl.innerHTML=`<div class="alert a-err">${e.message}</div>`;btn.disabled=false;btn.textContent='Sonucu Gönder';}
-  });
-}
-
-// ── APPROVE / DISPUTE ─────────────────────────────────────────────────────
-async function doApprove(m){
-  if(m.approvals?.includes(me.uid))return;
-  const na=[...(m.approvals||[]),me.uid];
-  const done=na.length>=2;
-  try{await updateDoc(doc(db,'matches',m.id),{approvals:na,status:done?'confirmed':'submitted',...(done?{confirmedAt:serverTimestamp()}:{})});}
-  catch(e){alert(e.message);}
-}
-async function doDispute(m){
-  if(!confirm('İtiraz: skor sıfırlanacak. Devam?'))return;
-  try{await updateDoc(doc(db,'matches',m.id),{status:'pending',homeGoals:null,awayGoals:null,homeRedCards:0,awayRedCards:0,submittedBy:null,approvals:[],submittedAt:null});}
-  catch(e){alert(e.message);}
-}
-
-// ── STATS ─────────────────────────────────────────────────────────────────
-function renderStats(){
-  if(!tournament?.players)return`<div class="empty"><p>Yükleniyor...</p></div>`;
-  const conf=matches.filter(m=>m.status==='confirmed');
-  const ps={};
-  tournament.players.forEach(p=>{ps[p.uid]={username:p.username,goals:0,rc:0,wins:0,draws:0,losses:0,mp:0,cs:0};});
-  conf.forEach(m=>{
-    const h=ps[m.homeUid],a=ps[m.awayUid];if(!h||!a)return;
-    h.goals+=m.homeGoals;a.goals+=m.awayGoals;
-    h.rc+=m.homeRedCards||0;a.rc+=m.awayRedCards||0;
-    h.mp++;a.mp++;
-    if(m.homeGoals>m.awayGoals){h.wins++;a.losses++;}else if(m.awayGoals>m.homeGoals){a.wins++;h.losses++;}else{h.draws++;a.draws++;}
-    if(m.awayGoals===0)h.cs++;if(m.homeGoals===0)a.cs++;
-  });
-  const rows=Object.values(ps).sort((a,b)=>b.goals-a.goals);
-  const tg=conf.reduce((s,m)=>s+m.homeGoals+m.awayGoals,0);
-  const trc=conf.reduce((s,m)=>s+(m.homeRedCards||0)+(m.awayRedCards||0),0);
-  const topS=rows[0];const mRC=[...rows].sort((a,b)=>b.rc-a.rc)[0];
-  return `<div class="sg mb-16">
-    <div class="sb"><div class="sv">${conf.length}</div><div class="sl">Maç</div></div>
-    <div class="sb"><div class="sv">${tg}</div><div class="sl">Gol</div></div>
-    <div class="sb"><div class="sv">${conf.length?(tg/conf.length).toFixed(1):'0'}</div><div class="sl">Maç/Gol</div></div>
-    <div class="sb"><div class="sv">${trc}</div><div class="sl">🟥</div></div>
-  </div>
-  <h3 class="sec">⚽ Oyuncu Detayları</h3>
-  <div class="card mb-16">
-    <table class="stbl">
-      <thead><tr><th style="text-align:left">Oyuncu</th><th>Maç</th><th>Gol</th><th>Ort</th><th>Galibiyet</th><th>TK</th><th>🟥</th></tr></thead>
-      <tbody>${rows.map(p=>`<tr>
-        <td><div class="pc"><div class="av">${p.username[0]}</div>${p.username}</div></td>
-        <td>${p.mp}</td><td style="color:var(--accent);font-weight:700">${p.goals}</td>
-        <td>${p.mp?(p.goals/p.mp).toFixed(1):'0'}</td>
-        <td>${p.wins}</td><td>${p.cs}</td><td style="color:var(--red)">${p.rc}</td>
-      </tr>`).join('')}</tbody>
-    </table>
-  </div>
-  ${topS?`<h3 class="sec">🏅 Liderler</h3>
-  <div class="sg">
-    <div class="sb"><div class="sv">${topS.username[0]}</div><div class="sl">Top Scorer<br>${topS.username} (${topS.goals} gol)</div></div>
-    <div class="sb"><div class="sv">${mRC?.username[0]||'-'}</div><div class="sl">En Fazla 🟥<br>${mRC?.username||'-'} (${mRC?.rc||0})</div></div>
-  </div>`:''}`;
-}
-
-// ── RENAME ────────────────────────────────────────────────────────────────
-function showRenameModal(){
-  const o=document.getElementById('modal-overlay');
-  o.innerHTML=`<div class="modal">
-    <div class="modal-title">✏️ Ad Değiştir <button class="btn btn-ghost btn-sm" id="mc">✕</button></div>
-    <div id="merr"></div>
-    <div class="fg mb-16"><label class="fl">Yeni Ad</label><input class="fi" id="nn" value="${myProfile?.username||''}"/></div>
-    <div class="alert a-warn mb-16" style="font-size:.79rem">⚠️ Sadece giriş adın değişir. Maçlardaki isimler değişmez.</div>
-    <button class="btn btn-primary btn-full" id="msave">Kaydet</button>
-  </div>`;
-  o.classList.remove('hidden');
-  o.querySelector('#mc').onclick=()=>o.classList.add('hidden');
-  o.addEventListener('click',e=>{if(e.target===o)o.classList.add('hidden');});
-  o.querySelector('#msave').addEventListener('click',async()=>{
-    const nn=document.getElementById('nn').value.trim();
-    const err=document.getElementById('merr');
-    if(!nn){err.innerHTML='<div class="alert a-err">Ad gir</div>';return;}
-    const btn=document.getElementById('msave');btn.disabled=true;btn.textContent='...';
-    try{
-      await updateProfile(me,{displayName:nn});
-      await updateDoc(doc(db,'users',me.uid),{username:nn});
-      myProfile={...myProfile,username:nn};
-      o.classList.add('hidden');
-      document.getElementById('nav-uname').textContent=nn;
-    }catch(e){err.innerHTML=`<div class="alert a-err">${e.message}</div>`;btn.disabled=false;btn.textContent='Kaydet';}
-  });
-}
+boot();
 </script>
 </body>
 </html>
