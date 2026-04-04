@@ -13,7 +13,7 @@ export function renderLogin(onSuccess) {
           <label class="fi-label">Kullanıcı Adı</label>
           <input class="fi" id="inp-user" placeholder="kullaniciadi" autocomplete="username" />
         </div>
-        <div class="fi-group" style="margin-bottom:20px">
+        <div class="fi-group mb-5">
           <label class="fi-label">Şifre</label>
           <input class="fi" id="inp-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
         </div>

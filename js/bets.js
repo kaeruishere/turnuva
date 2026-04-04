@@ -45,7 +45,7 @@ function drawBetForm(tourney, match, prev) {
 
   main.innerHTML = `
     <div class="sec-label" style="margin-top:0">Sıradaki Maç</div>
-    <div class="card" style="margin-bottom:20px">
+    <div class="card mb-5 p-0">
       <div class="next-match">
         <div class="nm-team">${match.home}</div>
         <div class="nm-vs">VS</div>
@@ -55,7 +55,7 @@ function drawBetForm(tourney, match, prev) {
     </div>
 
     <div class="sec-label">İddialarını Gir</div>
-    <div class="card" id="bet-form">
+    <div class="card p-0" id="bet-form">
 
       <!-- MAÇ SONUCU -->
       <div class="bet-section">
@@ -97,8 +97,8 @@ function drawBetForm(tourney, match, prev) {
 
     </div>
 
-    ${prev ? `<div style="font-size:.75rem;color:var(--text2);text-align:center;margin-bottom:10px">Son güncelleme: ${formatDate(prev.updatedAt)}</div>` : ''}
-    <button class="btn btn-primary btn-full" id="btn-save-bet" style="height:46px;font-size:.95rem">
+    ${prev ? `<div class="text-xs text-muted text-center mb-2">Son güncelleme: ${formatDate(prev.updatedAt)}</div>` : ''}
+    <button class="btn btn-primary btn-full mt-2" id="btn-save-bet" style="height:50px;">
       ${prev ? '✏️ İddiayı Güncelle' : '🎯 İddiayı Kaydet'}
     </button>
   `;
@@ -232,24 +232,26 @@ function drawResults(matchResults, scores, players) {
     .map(([u, pts]) => ({ u, pts }));
 
   let html = `
-    <div class="sec-label" style="margin-top:0">İddia Sıralaması</div>
-    <div class="card" style="margin-bottom:20px">
+    <div class="sec-label mt-0">İddia Sıralaması</div>
+    <div class="card mb-5 p-0">
+      <div class="table-wrap">
       <table class="stbl">
         <thead><tr>
-          <th>#</th>
-          <th style="text-align:left;padding-left:12px">Oyuncu</th>
-          <th style="color:var(--accent)">Puan</th>
+           <th>#</th>
+           <th style="text-align:left;padding-left:12px">Oyuncu</th>
+           <th class="text-accent">Puan</th>
         </tr></thead>
         <tbody>
           ${sorted.map((s, i) => `
             <tr>
               <td class="${['rank-1','rank-2','rank-3'][i]||''}" style="font-weight:700">${i+1}</td>
               <td class="pl-name">${s.u}</td>
-              <td style="color:var(--accent);font-weight:700">${s.pts}</td>
+              <td class="text-accent text-bold">${s.pts}</td>
             </tr>
           `).join('')}
         </tbody>
       </table>
+      </div>
     </div>
 
     <div class="sec-label">Maç Bazlı Sonuçlar</div>

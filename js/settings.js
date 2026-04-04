@@ -22,34 +22,34 @@ export async function openSettings(navigate) {
 
   openModal(`
     <div class="modal settings-modal">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
-        <h3 style="font-family:'Bebas Neue';font-size:1.3rem;letter-spacing:.06em">⚙️ AYARLAR</h3>
-        <button class="btn btn-ghost btn-sm" id="s-close">✕</button>
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="modal-title mb-0" style="margin-bottom:0">⚙️ AYARLAR</h3>
+        <button class="btn btn-ghost btn-sm" id="s-close" style="font-size:1.2rem">✕</button>
       </div>
 
-      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:10px">Kural Ayarları</div>
-      <label style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--el);border:1px solid var(--border-hi);border-radius:10px;cursor:pointer;margin-bottom:22px;gap:12px">
+      <div class="sec-label" style="border:none">Kural Ayarları</div>
+      <label class="flex items-center justify-between gap-3 mb-5" style="padding:16px; background:var(--el-bg); border:1px solid var(--border-color); border-radius:var(--border-radius-md); cursor:pointer;">
         <div>
-          <div style="font-size:.88rem;font-weight:600;margin-bottom:3px">🟥 Kırmızı Kart Averaj Düşürür</div>
-          <div style="font-size:.74rem;color:var(--text2)">Her kırmızı kart gol averajını -1 azaltır</div>
+          <div class="text-bold mb-1">🟥 Kırmızı Kart Averaj Düşürür</div>
+          <div class="text-xs text-muted">Her kırmızı kart gol averajını -1 azaltır</div>
         </div>
-        <input type="checkbox" id="chk-redcard" ${currentRedCard?'checked':''} style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;flex-shrink:0">
+        <input type="checkbox" id="chk-redcard" ${currentRedCard?'checked':''} style="width:22px;height:22px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;">
       </label>
 
-      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:10px">Aktif Turnuva</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:22px">
+      <div class="sec-label" style="border:none">Aktif Turnuva</div>
+      <div class="flex flex-col gap-2 mb-5">
         <button class="btn btn-danger btn-full" id="btn-end-t" ${!activeTId?'disabled':''}>🏁 Turnuvayı Bitir</button>
         <button class="btn btn-secondary btn-full" id="btn-delete-t" ${!activeTId?'disabled':''}>🗑️ Turnuvayı Sil</button>
       </div>
 
-      <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:10px">Son Bitirilen Turnuva</div>
+      <div class="sec-label" style="border:none">Son Bitirilen Turnuva</div>
       ${lastDoneTId ? `
-        <div style="background:var(--el);border:1px solid var(--border-hi);border-radius:10px;padding:11px 13px;margin-bottom:10px">
-          <div style="font-size:.82rem;font-weight:600;margin-bottom:2px">${lastDoneName}</div>
-          <div style="font-size:.72rem;color:var(--text2)">Yanlışlıkla bitirdiysen geri alabilirsin</div>
+        <div style="background:var(--el-bg); border:1px solid var(--border-color); border-radius:var(--border-radius-md); padding:16px; margin-bottom:12px;">
+          <div class="text-bold mb-1">${lastDoneName}</div>
+          <div class="text-xs text-muted">Yanlışlıkla bitirdiysen geri alabilirsin</div>
         </div>
         <button class="btn btn-secondary btn-full" id="btn-reopen-t">↩ Turnuvayı Tekrar Başlat</button>
-      ` : `<div style="font-size:.82rem;color:var(--text3)">Bitirilen turnuva yok</div>`}
+      ` : `<div class="text-sm text-muted text-center" style="padding:10px">Bitirilen turnuva yok</div>`}
     </div>
   `);
 

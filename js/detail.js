@@ -62,8 +62,9 @@ function drawDetail(navigate) {
     </div>
 
     <!-- PUAN DURUMU -->
-    <div class="sec-label">Puan Durumu</div>
-    <div class="card">
+    <div class="sec-label mt-4">Puan Durumu</div>
+    <div class="card p-0">
+      <div class="table-wrap">
       <table class="stbl">
         <thead><tr>
           <th>#</th>
@@ -87,6 +88,7 @@ function drawDetail(navigate) {
           `).join('')}
         </tbody>
       </table>
+      </div>
     </div>
 
     <!-- SIRADAKI MAÇ -->
@@ -135,34 +137,29 @@ function openMatchModal(mid) {
 
   openModal(`
     <div class="modal">
-      <h3 style="margin-bottom:6px">${m.home} vs ${m.away}</h3>
-      <div style="display:grid;grid-template-columns:1fr 24px 1fr;align-items:center;gap:6px;margin-bottom:${red?'10px':'18px'}">
-        <input type="number" id="mhg" class="fi" value="${m.hG}" min="0" max="99"
-          style="text-align:center;font-size:2rem;font-family:'Bebas Neue',sans-serif;padding:10px">
-        <div style="text-align:center;font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--text3)">-</div>
-        <input type="number" id="mag" class="fi" value="${m.aG}" min="0" max="99"
-          style="text-align:center;font-size:2rem;font-family:'Bebas Neue',sans-serif;padding:10px">
+      <h3 class="modal-title mb-3">${m.home} vs ${m.away}</h3>
+      <div class="flex justify-center items-center gap-3 mb-4">
+        <input type="number" id="mhg" class="fi score-input" value="${m.hG}" min="0" max="99">
+        <div class="text-muted" style="font-family:'Bebas Neue',sans-serif;font-size:2rem;">-</div>
+        <input type="number" id="mag" class="fi score-input" value="${m.aG}" min="0" max="99">
       </div>
       ${red ? `
-        <div style="background:rgba(255,69,96,.07);border:1px solid rgba(255,69,96,.18);border-radius:10px;padding:11px 12px;margin-bottom:16px">
-          <div style="font-size:.7rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px">🟥 Kırmızı Kart</div>
-          <div style="display:grid;grid-template-columns:1fr 24px 1fr;align-items:center;gap:6px">
-            <div>
-              <div style="font-size:.72rem;color:var(--text2);text-align:center;margin-bottom:5px">${m.home}</div>
-              <input type="number" id="mhred" class="fi" value="${m.hRed||0}" min="0" max="11"
-                style="text-align:center;font-size:1.3rem;font-family:'Bebas Neue',sans-serif;padding:7px;border-color:rgba(255,69,96,.3)">
+        <div style="background:var(--red-dim);border:1px solid rgba(255,75,106,.2);border-radius:var(--border-radius-md);padding:14px;margin-bottom:20px">
+          <div class="text-red text-center mb-2 text-xs" style="font-weight:800;letter-spacing:1px">🟥 KIRMIZI KART</div>
+          <div class="flex justify-between items-center gap-2">
+            <div class="flex-col items-center flex" style="flex:1">
+              <div class="text-xs text-muted mb-1">${m.home}</div>
+              <input type="number" id="mhred" class="fi score-input redcard-input" value="${m.hRed||0}" min="0" max="11">
             </div>
-            <div></div>
-            <div>
-              <div style="font-size:.72rem;color:var(--text2);text-align:center;margin-bottom:5px">${m.away}</div>
-              <input type="number" id="mared" class="fi" value="${m.aRed||0}" min="0" max="11"
-                style="text-align:center;font-size:1.3rem;font-family:'Bebas Neue',sans-serif;padding:7px;border-color:rgba(255,69,96,.3)">
+            <div class="flex-col items-center flex" style="flex:1">
+              <div class="text-xs text-muted mb-1">${m.away}</div>
+              <input type="number" id="mared" class="fi score-input redcard-input" value="${m.aRed||0}" min="0" max="11">
             </div>
           </div>
         </div>
       ` : ''}
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;gap:8px">
+      <div class="flex flex-col gap-2">
+        <div class="flex gap-2">
           <button class="btn btn-secondary btn-full" id="m-cancel">İptal</button>
           <button class="btn btn-primary btn-full" id="m-save">💾 Kaydet</button>
         </div>

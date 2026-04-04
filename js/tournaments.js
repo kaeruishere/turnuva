@@ -28,8 +28,7 @@ export function renderTournaments(navigate) {
     }));
 
     let html = `
-      <button class="btn btn-primary btn-full" id="btn-new-t"
-        style="margin-bottom:18px;height:46px;font-size:.95rem;letter-spacing:.04em">
+      <button class="btn btn-primary btn-full mb-4" id="btn-new-t" style="height:50px;">
         ＋ Yeni Turnuva Başlat
       </button>
     `;
@@ -65,14 +64,15 @@ function cardHTML(t, mc, isActive) {
   const done  = mc?.done  ?? 0;
   const total = mc?.total ?? 0;
   return `
-    <div class="t-card ${isActive ? 'active-t' : ''}" data-id="${t.id}">
+    <div class="card card-hoverable t-card ${isActive ? 'active-t' : ''}" data-id="${t.id}" style="padding:14px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
+      <div class="t-card-accent"></div>
       <div>
         <div class="t-card-name">${t.name}</div>
         <div class="t-card-meta">${formatDate(t.createdAt)} · ${done}/${total} maç tamamlandı</div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
+      <div class="flex items-center gap-2">
         <div class="t-badge ${isActive ? 'active' : 'done'}">${isActive ? 'Aktif' : 'Bitti'}</div>
-        <span style="color:var(--text3);font-size:1.1rem">›</span>
+        <span class="text-muted" style="font-size:1.4rem; padding-bottom:2px">›</span>
       </div>
     </div>
   `;
