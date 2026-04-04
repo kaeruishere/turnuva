@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PES Ligi — Scoreboard</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --bg:#03050a;
+      --card:#08101a;
+      --el:#0f1a26;
+      --border:rgba(255,255,255,0.07);
+      --border-hi:rgba(255,255,255,0.14);
+      --accent:#00e5a0;
+      --accent-dim:rgba(0,229,160,0.1);
+      --accent-glow:rgba(0,229,160,0.3);
+      --red:#ff4560;
+      --yellow:#ffd230;
+      --blue:#4da6ff;
+      --text:#eef2f7;
+      --text2:#7a8fa3;
+      --text3:#2e3e50;
+      --gold:#ffd700;
+      --silver:#c0c0c0;
+      --bronze:#cd7f32;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 48px,rgba(255,255,255,0.006) 48px,rgba(255,255,255,0.006) 49px);pointer-events:none}
+    h1,h2,h3,.bb{font-family:'Bebas Neue',sans-serif;letter-spacing:.06em}
+
+    /* TOP BAR */
+    .topbar{background:rgba(3,5,10,.97);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:50;backdrop-filter:blur(20px)}
+    .topbar-brand{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.12em;color:var(--accent)}
+    .topbar-brand span{color:var(--text)}
+    .topbar-right{display:flex;align-items:center;gap:10px}
+
+    /* LAYOUT */
+    .page{padding:20px 24px 60px;max-width:1200px;margin:0 auto}
+
+    /* SCORE PANEL */
+    .score-panel{background:var(--card);border:1px solid var(--border-hi);border-radius:16px;overflow:hidden;margin-bottom:24px;transition:all .3s}
+    .score-panel.hidden-panel{display:none}
+    .score-panel-header{background:rgba(0,229,160,.07);border-bottom:1px solid var(--border-hi);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+    .score-panel-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.1em;color:var(--accent)}
+    .score-panel-body{padding:24px}
+
+    /* LIVE SCORE DISPLAY */
+    .live-score{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;margin-bottom:24px}
+    .ls-team{text-align:center}
+    .ls-name{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.06em;line-height:1}
+    .ls-score-wrap{display:flex;align-items:center;gap:12px}
+    .ls-score{font-family:'Bebas Neue',sans-serif;font-size:5rem;line-height:1;color:var(--text);min-width:90px;text-align:center}
+    .ls-sep{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--text3)}
+    .ls-controls{display:flex;flex-direction:column;align-items:center;gap:6px}
+    .score-btn{width:40px;height:40px;border-radius:10px;border:none;cursor:pointer;font-size:1.2rem;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .score-btn-plus{background:var(--accent);color:#000}
+    .score-btn-plus:hover{background:#00ffb3;box-shadow:0 0 16px var(--accent-glow)}
+    .score-btn-minus{background:var(--el);color:var(--text2);border:1px solid var(--border-hi)}
+    .score-btn-minus:hover{background:rgba(255,69,96,.15);color:var(--red)}
+
+    .red-cards-row{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;padding:14px;background:var(--el);border-radius:10px;margin-bottom:16px}
+    .rc-side{display:flex;align-items:center;gap:10px}
+    .rc-label{font-size:.75rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em}
+    .rc-count{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--red);min-width:30px;text-align:center}
+    .rc-sep{font-size:.8rem;color:var(--text3);text-align:center}
+    .rc-btn{width:28px;height:28px;border-radius:7px;border:none;cursor:pointer;font-size:.9rem;font-weight:700;display:flex;align-items:center;justify-content:center;background:rgba(255,69,96,.15);color:var(--red);transition:all .15s}
+    .rc-btn:hover{background:rgba(255,69,96,.3)}
+    .rc-btn.plus{background:rgba(255,69,96,.1)}
+
+    .match-select-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;margin-bottom:16px}
+    .select-box{background:var(--el);border:1px solid var(--border-hi);border-radius:9px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;cursor:pointer;width:100%}
+    .select-box option{background:var(--el)}
+    .select-box:focus{border-color:var(--accent)}
+
+    /* STANDINGS PANEL */
+    .standings-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+    .standings-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .standings-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em}
+    .tournament-select-row{padding:14px 20px;border-bottom:1px solid var(--border)}
+
+    .stbl{width:100%;border-collapse:collapse}
+    .stbl th{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding:11px 14px;text-align:center;border-bottom:1px solid var(--border)}
+    .stbl th:nth-child(2){text-align:left}
+    .stbl td{padding:13px 14px;text-align:center;border-bottom:1px solid var(--border);font-size:.9rem}
+    .stbl td:nth-child(2){text-align:left}
+    .stbl tbody tr:last-child td{border-bottom:none}
+    .stbl tbody tr:hover{background:var(--el)}
+
+    .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:.75rem;font-weight:700}
+    .r1{background:var(--gold);color:#000}
+    .r2{background:var(--silver);color:#000}
+    .r3{background:var(--bronze);color:#000}
+    .r4{background:var(--el);color:var(--text2)}
+    .p-cell{display:flex;align-items:center;gap:10px}
+    .avatar{width:32px;height:32px;border-radius:50%;background:var(--el);border:1px solid var(--border-hi);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--accent);flex-shrink:0;text-transform:uppercase}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:9px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.84rem;cursor:pointer;border:none;transition:all .15s}
+    .btn-primary{background:var(--accent);color:#000}
+    .btn-primary:hover{background:#00ffb3}
+    .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+    .btn-ghost:hover{color:var(--text);border-color:var(--border-hi)}
+    .btn-sm{padding:6px 12px;font-size:.78rem}
+    .btn-danger{background:rgba(255,69,96,.14);color:var(--red);border:1px solid rgba(255,69,96,.28)}
+
+    .badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:5px;font-size:.67rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+    .b-green{background:rgba(0,229,160,.14);color:var(--accent)}
+    .b-red{background:rgba(255,69,96,.14);color:var(--red)}
+    .b-gray{background:var(--el);color:var(--text2)}
+
+    .live-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;background:rgba(255,69,96,.14);border:1px solid rgba(255,69,96,.28);color:var(--red);font-size:.75rem;font-weight:700;letter-spacing:.05em}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 1.2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+    .empty{text-align:center;padding:48px 20px;color:var(--text3)}
+    .spinner-wrap{display:flex;align-items:center;justify-content:center;padding:40px}
+    .spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .fl{display:block;font-size:.75rem;font-weight:700;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+
+    .hidden{display:none!important}
+    .text-accent{color:var(--accent)}
+    .text-muted{color:var(--text2)}
+    .text-sm{font-size:.85rem}
+
+    /* Responsive */
+    @media(max-width:700px){
+      .ls-score{font-size:3.5rem}
+      .ls-name{font-size:1.3rem}
+      .page{padding:12px 14px 40px}
+    }
+
+    /* Form goal bar */
+    .form-bar{display:flex;justify-content:center;gap:3px;margin-top:6px}
+    .form-w{width:8px;height:8px;border-radius:2px;background:var(--accent)}
+    .form-d{width:8px;height:8px;border-radius:2px;background:var(--yellow)}
+    .form-l{width:8px;height:8px;border-radius:2px;background:var(--red)}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-brand">⚽ <span>PES</span> LİGİ — SCOREBOARD</div>
+  <div class="topbar-right">
+    <div class="live-badge"><div class="live-dot"></div>CANLI</div>
+    <button class="btn btn-ghost btn-sm" id="toggle-score-btn">🎮 Skoru Gizle</button>
+  </div>
+</div>
+
+<div class="page">
+  <!-- SCORE PANEL -->
+  <div class="score-panel" id="score-panel">
+    <div class="score-panel-header">
+      <span class="score-panel-title">🎮 Şu Anki Maç</span>
+      <select class="select-box" id="match-select" style="max-width:340px;background:var(--el)">
+        <option value="">— Turnuva ve Maç Seç —</option>
+      </select>
+    </div>
+    <div class="score-panel-body">
+      <div class="live-score" id="live-score-area">
+        <div class="ls-team">
+          <div class="ls-name" id="home-name">EV SAHİBİ</div>
+        </div>
+        <div class="ls-score-wrap">
+          <div class="ls-controls">
+            <button class="score-btn score-btn-plus" id="home-plus">+</button>
+            <div class="ls-score" id="home-score">0</div>
+            <button class="score-btn score-btn-minus" id="home-minus">-</button>
+          </div>
+          <div class="ls-sep">-</div>
+          <div class="ls-controls">
+            <button class="score-btn score-btn-plus" id="away-plus">+</button>
+            <div class="ls-score" id="away-score">0</div>
+            <button class="score-btn score-btn-minus" id="away-minus">-</button>
+          </div>
+        </div>
+        <div class="ls-team">
+          <div class="ls-name" id="away-name">DEPLASMaN</div>
+        </div>
+      </div>
+
+      <div class="red-cards-row" id="red-cards-row">
+        <div class="rc-side" style="justify-content:flex-end">
+          <span class="rc-label" id="home-rc-label">Ev</span>
+          <button class="rc-btn plus" id="home-rc-plus">+🟥</button>
+          <span class="rc-count" id="home-rc-count">0</span>
+          <button class="rc-btn" id="home-rc-minus">-</button>
+        </div>
+        <div class="rc-sep">KIRMIZI KARTLAR</div>
+        <div class="rc-side">
+          <button class="rc-btn" id="away-rc-minus">-</button>
+          <span class="rc-count" id="away-rc-count">0</span>
+          <button class="rc-btn plus" id="away-rc-plus">+🟥</button>
+          <span class="rc-label" id="away-rc-label">Deplasman</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="btn btn-primary" id="save-score-btn">💾 Maçı Kaydet (Firestore'a Gönder)</button>
+        <button class="btn btn-ghost" id="reset-score-btn">🔄 Sıfırla</button>
+      </div>
+      <p class="text-muted text-sm" style="text-align:center;margin-top:10px">Kaydet'e bastığında maç "submitted" olarak gönderilir, oyuncuların onayı gerekecektir.</p>
+    </div>
+  </div>
+
+  <!-- STANDINGS PANEL -->
+  <div class="standings-panel">
+    <div class="standings-header">
+      <h2 class="standings-title">🏆 Lig Tablosu</h2>
+      <div id="standings-badges"></div>
+    </div>
+    <div class="tournament-select-row">
+      <label class="fl">Turnuva</label>
+      <select class="select-box" id="tournament-select">
+        <option value="">Yükleniyor...</option>
+      </select>
+    </div>
+    <div id="standings-body"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, getDocs, getDoc, doc, query, where,
+  onSnapshot, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCII19pXF_SLL2Tkjw3FeaPxYHNQ_b3J_Q",
+  authDomain: "turnuva-kaeru.firebaseapp.com",
+  projectId: "turnuva-kaeru",
+  storageBucket: "turnuva-kaeru.firebasestorage.app",
+  messagingSenderId: "2078204583",
+  appId: "1:2078204583:web:2c83665f82417e3e843182"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+
+// State
+let tournaments = [];
+let currentTournamentId = null;
+let currentMatches = [];
+let selectedMatchId = null;
+let unsubMatches = null;
+let homeScore = 0, awayScore = 0, homeRC = 0, awayRC = 0;
+
+// Toggle score panel
+document.getElementById('toggle-score-btn').addEventListener('click', () => {
+  const panel = document.getElementById('score-panel');
+  const btn = document.getElementById('toggle-score-btn');
+  panel.classList.toggle('hidden-panel');
+  btn.textContent = panel.classList.contains('hidden-panel') ? '🎮 Skoru Göster' : '🎮 Skoru Gizle';
+});
+
+// Load tournaments
+async function loadTournaments() {
+  const snap = await getDocs(collection(db,'tournaments'));
+  tournaments = snap.docs.map(d=>({id:d.id,...d.data()}))
+    .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  
+  const tSel = document.getElementById('tournament-select');
+  const mSel = document.getElementById('match-select');
+  tSel.innerHTML = `<option value="">— Turnuva Seç —</option>` + 
+    tournaments.map(t=>`<option value="${t.id}">${t.name}${t.status==='active'?' (Aktif)':''}</option>`).join('');
+  mSel.innerHTML = `<option value="">— Önce Turnuva Seç —</option>`;
+
+  // Auto-select active
+  const active = tournaments.find(t=>t.status==='active');
+  if (active) { tSel.value = active.id; selectTournament(active.id); }
+}
+
+async function selectTournament(id) {
+  currentTournamentId = id;
+  if (unsubMatches) { unsubMatches(); unsubMatches = null; }
+  if (!id) { document.getElementById('standings-body').innerHTML = `<div class="empty">Turnuva seç</div>`; return; }
+
+  const q = query(collection(db,'matches'), where('tournamentId','==',id));
+  unsubMatches = onSnapshot(q, snap => {
+    currentMatches = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderStandings();
+    populateMatchSelect();
+  });
+}
+
+document.getElementById('tournament-select').addEventListener('change', e => {
+  selectTournament(e.target.value);
+});
+
+function populateMatchSelect() {
+  const t = tournaments.find(x=>x.id===currentTournamentId);
+  if (!t) return;
+  const sel = document.getElementById('match-select');
+  const pending = currentMatches.filter(m=>m.status==='pending'||m.status==='submitted');
+  sel.innerHTML = `<option value="">— Maç Seç —</option>` +
+    pending.map(m=>`<option value="${m.id}">${m.homeName} vs ${m.awayName}${m.status==='submitted'?' (Skor Girildi)':''}</option>`).join('') +
+    (pending.length===0?`<option disabled>Bekleyen maç yok</option>`:'');
+}
+
+document.getElementById('match-select').addEventListener('change', e => {
+  selectedMatchId = e.target.value;
+  const m = currentMatches.find(x=>x.id===selectedMatchId);
+  if (!m) return;
+  document.getElementById('home-name').textContent = m.homeName.toUpperCase();
+  document.getElementById('away-name').textContent = m.awayName.toUpperCase();
+  document.getElementById('home-rc-label').textContent = m.homeName;
+  document.getElementById('away-rc-label').textContent = m.awayName;
+  // Restore if already submitted
+  homeScore = m.homeGoals??0; awayScore = m.awayGoals??0;
+  homeRC = m.homeRedCards??0; awayRC = m.awayRedCards??0;
+  updateScoreDisplay();
+});
+
+// Score controls
+function updateScoreDisplay() {
+  document.getElementById('home-score').textContent = homeScore;
+  document.getElementById('away-score').textContent = awayScore;
+  document.getElementById('home-rc-count').textContent = homeRC;
+  document.getElementById('away-rc-count').textContent = awayRC;
+}
+
+document.getElementById('home-plus').onclick = ()=>{ homeScore++; updateScoreDisplay(); };
+document.getElementById('home-minus').onclick = ()=>{ if(homeScore>0) homeScore--; updateScoreDisplay(); };
+document.getElementById('away-plus').onclick = ()=>{ awayScore++; updateScoreDisplay(); };
+document.getElementById('away-minus').onclick = ()=>{ if(awayScore>0) awayScore--; updateScoreDisplay(); };
+document.getElementById('home-rc-plus').onclick = ()=>{ homeRC++; updateScoreDisplay(); };
+document.getElementById('home-rc-minus').onclick = ()=>{ if(homeRC>0) homeRC--; updateScoreDisplay(); };
+document.getElementById('away-rc-plus').onclick = ()=>{ awayRC++; updateScoreDisplay(); };
+document.getElementById('away-rc-minus').onclick = ()=>{ if(awayRC>0) awayRC--; updateScoreDisplay(); };
+document.getElementById('reset-score-btn').onclick = ()=>{ homeScore=0;awayScore=0;homeRC=0;awayRC=0; updateScoreDisplay(); };
+
+document.getElementById('save-score-btn').addEventListener('click', async () => {
+  if (!selectedMatchId) { alert('Önce maç seç!'); return; }
+  const btn = document.getElementById('save-score-btn');
+  btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+  try {
+    await updateDoc(doc(db,'matches',selectedMatchId), {
+      status:'submitted',
+      homeGoals:homeScore, awayGoals:awayScore,
+      homeRedCards:homeRC, awayRedCards:awayRC,
+      submittedBy:'scoreboard',
+      submittedAt:serverTimestamp(),
+      approvals:[]
+    });
+    btn.textContent = '✅ Gönderildi!';
+    setTimeout(()=>{ btn.disabled=false; btn.textContent='💾 Maçı Kaydet (Firestore\'a Gönder)'; }, 2000);
+  } catch(e) {
+    alert(e.message);
+    btn.disabled=false; btn.textContent='💾 Maçı Kaydet';
+  }
+});
+
+// Standings
+function renderStandings() {
+  const t = tournaments.find(x=>x.id===currentTournamentId);
+  const bodyEl = document.getElementById('standings-body');
+  const badgesEl = document.getElementById('standings-badges');
+  if (!t) { bodyEl.innerHTML=`<div class="empty">Turnuva seç</div>`; return; }
+
+  const confirmed = currentMatches.filter(m=>m.status==='confirmed');
+  const total = currentMatches.length;
+  badgesEl.innerHTML = `
+    <span class="badge ${t.status==='active'?'b-green':'b-gray'}">${t.status==='active'?'Aktif':'Bitti'}</span>
+    <span style="margin-left:8px;font-size:.8rem;color:var(--text2)">${confirmed.length}/${total} maç</span>`;
+
+  const rows = calcStandings(t.players||[], currentMatches);
+  const ranks = ['r1','r2','r3','r4'];
+
+  // Per-player form (last 5 results)
+  const formMap = {};
+  (t.players||[]).forEach(p => { formMap[p.uid] = []; });
+  confirmed.sort((a,b)=>(a.confirmedAt?.seconds||0)-(b.confirmedAt?.seconds||0)).forEach(m => {
+    const hg=m.homeGoals, ag=m.awayGoals;
+    if (formMap[m.homeUid]) formMap[m.homeUid].push(hg>ag?'W':hg<ag?'L':'D');
+    if (formMap[m.awayUid]) formMap[m.awayUid].push(ag>hg?'W':ag<hg?'L':'D');
+  });
+
+  bodyEl.innerHTML = `
+  <table class="stbl">
+    <thead>
+      <tr>
+        <th>#</th><th>Oyuncu</th><th>O</th><th>G</th><th>B</th><th>M</th>
+        <th>AG</th><th>YG</th><th>AV</th><th>🟥</th><th>Form</th><th>P</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map((p,i) => {
+        const form = (formMap[p.uid]||[]).slice(-5);
+        const formDots = form.map(r=>`<div class="form-${r==='W'?'w':r==='D'?'d':'l'}"></div>`).join('');
+        return `
+        <tr>
+          <td><span class="rank-badge ${ranks[i]||'r4'}">${i+1}</span></td>
+          <td><div class="p-cell"><div class="avatar">${p.username[0]}</div><strong>${p.username}</strong></div></td>
+          <td>${p.played}</td><td>${p.won}</td><td>${p.drawn}</td><td>${p.lost}</td>
+          <td>${p.goalsFor}</td><td>${p.goalsAgainst}</td>
+          <td style="color:${p.goalDiff>=0?'var(--accent)':'var(--red)'};font-weight:600">${p.goalDiff>0?'+':''}${p.goalDiff}</td>
+          <td style="color:var(--red)">${p.redCards}</td>
+          <td><div class="form-bar">${formDots}</div></td>
+          <td><strong style="color:var(--accent);font-size:1.05rem">${p.points}</strong></td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>
+  ${rows.length===0?`<div class="empty">Henüz onaylanan maç yok</div>`:''}
+  <div style="padding:12px 16px;font-size:.72rem;color:var(--text3);border-top:1px solid var(--border);text-align:center">
+    O=Oyun · G=Galibiyet · B=Beraberlik · M=Mağlubiyet · AV=Averaj · P=Puan · Form (son 5)
+  </div>`;
+}
+
+function calcStandings(players, matches) {
+  const t = {};
+  players.forEach(p => {
+    t[p.uid] = {uid:p.uid,username:p.username,played:0,won:0,drawn:0,lost:0,goalsFor:0,goalsAgainst:0,redCards:0,points:0};
+  });
+  matches.filter(m=>m.status==='confirmed').forEach(m => {
+    const h=t[m.homeUid], a=t[m.awayUid];
+    if(!h||!a) return;
+    const hg=m.homeGoals, ag=m.awayGoals;
+    h.played++; a.played++;
+    h.goalsFor+=hg; h.goalsAgainst+=ag;
+    a.goalsFor+=ag; a.goalsAgainst+=hg;
+    h.redCards+=m.homeRedCards||0; a.redCards+=m.awayRedCards||0;
+    if(hg>ag){h.won++;h.points+=3;a.lost++;}
+    else if(ag>hg){a.won++;a.points+=3;h.lost++;}
+    else{h.drawn++;h.points++;a.drawn++;a.points++;}
+  });
+  return Object.values(t)
+    .map(p=>({...p,goalDiff:p.goalsFor-p.goalsAgainst}))
+    .sort((a,b)=>b.points-a.points||b.goalDiff-a.goalDiff||b.goalsFor-a.goalsFor);
+}
+
+loadTournaments();
+</script>
+</body>
+</html>

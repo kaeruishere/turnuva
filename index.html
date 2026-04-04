@@ -7,924 +7,908 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #06080d;
+      --bg-card: #0c1018;
+      --bg-el: #111822;
+      --bg-hover: #16202e;
+      --border: rgba(255,255,255,0.06);
+      --border-hi: rgba(255,255,255,0.12);
+      --accent: #00e5a0;
+      --accent-dim: rgba(0,229,160,0.1);
+      --accent-glow: rgba(0,229,160,0.25);
+      --red: #ff4560;
+      --yellow: #ffd230;
+      --blue: #4da6ff;
+      --text: #eef2f7;
+      --text-2: #7a8fa3;
+      --text-3: #38495a;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 44px,rgba(255,255,255,0.007) 44px,rgba(255,255,255,0.007) 45px);pointer-events:none;z-index:0}
+    #app{position:relative;z-index:1;min-height:100vh}
+    h1,h2,h3,.display{font-family:'Bebas Neue',sans-serif;letter-spacing:.06em}
+
+    /* NAV */
+    .nav{background:rgba(6,8,13,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:56px}
+    .nav-brand{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.12em;color:var(--accent);text-decoration:none;cursor:pointer;display:flex;align-items:center;gap:6px}
+    .nav-brand span{color:var(--text)}
+    .nav-right{display:flex;align-items:center;gap:10px}
+    .nav-user{font-size:.82rem;color:var(--text-2);font-weight:600}
+
+    /* MAIN */
+    .main{padding:24px 16px 80px;max-width:900px;margin:0 auto;width:100%}
+
+    /* AUTH */
+    .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .auth-glow{position:fixed;top:15%;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(0,229,160,0.05) 0%,transparent 70%);pointer-events:none}
+    .auth-inner{width:100%;max-width:360px}
+    .auth-brand{text-align:center;margin-bottom:32px}
+    .auth-icon{font-size:2rem;width:60px;height:60px;background:var(--accent-dim);border:1px solid var(--accent-glow);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+
+    /* CARD */
+    .card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .card-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .card-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.08em}
+    .card-body{padding:20px}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:9px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.875rem;cursor:pointer;border:none;transition:all .15s;text-decoration:none;white-space:nowrap}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .btn-primary{background:var(--accent);color:#000}
+    .btn-primary:hover:not(:disabled){background:#00ffb3;box-shadow:0 0 24px var(--accent-glow)}
+    .btn-secondary{background:var(--bg-el);color:var(--text);border:1px solid var(--border-hi)}
+    .btn-secondary:hover:not(:disabled){background:var(--bg-hover)}
+    .btn-ghost{background:transparent;color:var(--text-2);border:1px solid var(--border)}
+    .btn-ghost:hover:not(:disabled){color:var(--text);border-color:var(--border-hi)}
+    .btn-danger{background:rgba(255,69,96,.14);color:var(--red);border:1px solid rgba(255,69,96,.28)}
+    .btn-danger:hover:not(:disabled){background:rgba(255,69,96,.24)}
+    .btn-sm{padding:5px 11px;font-size:.78rem}
+    .btn-lg{padding:13px 28px;font-size:1rem}
+    .btn-full{width:100%}
+
+    /* FORM */
+    .fg{margin-bottom:16px}
+    .fl{display:block;font-size:.77rem;font-weight:700;color:var(--text-2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+    .fi{width:100%;background:var(--bg-el);border:1px solid var(--border-hi);border-radius:9px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
+    .fi:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,160,.1)}
+    .fi::placeholder{color:var(--text-3)}
+    select.fi{cursor:pointer}
+    select.fi option{background:var(--bg-el);color:var(--text)}
+
+    /* BADGE */
+    .badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:5px;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .b-green{background:rgba(0,229,160,.14);color:var(--accent)}
+    .b-red{background:rgba(255,69,96,.14);color:var(--red)}
+    .b-yellow{background:rgba(255,210,48,.14);color:var(--yellow)}
+    .b-blue{background:rgba(77,166,255,.14);color:var(--blue)}
+    .b-gray{background:var(--bg-el);color:var(--text-2)}
+
+    /* TABS */
+    .tabs{display:flex;gap:3px;background:var(--bg-el);border-radius:11px;padding:4px}
+    .tab{flex:1;padding:8px 6px;text-align:center;font-size:.78rem;font-weight:600;border-radius:8px;cursor:pointer;transition:all .15s;color:var(--text-3);border:none;background:none;letter-spacing:.04em;font-family:'DM Sans',sans-serif}
+    .tab.active{background:var(--bg-card);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+
+    /* STANDINGS TABLE */
+    .stbl{width:100%;border-collapse:collapse}
+    .stbl th{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);padding:10px 10px;text-align:center;border-bottom:1px solid var(--border)}
+    .stbl th:first-child{text-align:left}
+    .stbl td{padding:11px 10px;text-align:center;border-bottom:1px solid var(--border);font-size:.88rem}
+    .stbl td:first-child{text-align:left}
+    .stbl tbody tr:hover{background:var(--bg-el)}
+    .stbl tbody tr:last-child td{border-bottom:none}
+    .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;font-size:.74rem;font-weight:700}
+    .r1{background:var(--gold);color:#000}
+    .r2{background:var(--silver);color:#000}
+    .r3{background:var(--bronze);color:#000}
+    .r4{background:var(--bg-el);color:var(--text-2)}
+    .p-cell{display:flex;align-items:center;gap:9px}
+    .avatar{width:30px;height:30px;border-radius:50%;background:var(--bg-el);border:1px solid var(--border-hi);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--accent);flex-shrink:0;text-transform:uppercase}
+
+    /* MATCH CARD */
+    .match-card{background:var(--bg-card);border:1px solid var(--border);border-radius:11px;padding:13px 15px;margin-bottom:8px;transition:border-color .15s}
+    .match-card:hover{border-color:var(--border-hi)}
+    .match-row{display:flex;align-items:center;gap:8px}
+    .match-team{flex:1;text-align:center}
+    .match-name{font-weight:600;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .match-score{display:flex;align-items:center;gap:4px;font-family:'Bebas Neue',sans-serif;font-size:1.6rem;min-width:80px;justify-content:center}
+    .score-sep{color:var(--text-3);font-size:1.2rem}
+    .match-vs{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--text-3);letter-spacing:.1em;min-width:80px;text-align:center}
+    .match-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+    .red-cards-row{display:flex;gap:8px;justify-content:center;margin-top:6px;font-size:.75rem;color:var(--text-2)}
+
+    /* TOURNAMENT LIST */
+    .t-item{background:var(--bg-card);border:1px solid var(--border);border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:8px}
+    .t-item:hover{border-color:var(--border-hi);background:var(--bg-el)}
+    .t-icon{width:42px;height:42px;background:var(--accent-dim);border:1px solid var(--accent-glow);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.2rem}
+    .t-info{flex:1;min-width:0}
+    .t-name{font-weight:700;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+    /* MODAL */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .15s ease}
+    .overlay.hidden{display:none}
+    @media(min-width:600px){.overlay{align-items:center;padding:20px}}
+    .modal{background:var(--bg-card);border:1px solid var(--border-hi);border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:460px;animation:slideUp .2s ease;max-height:90vh;overflow-y:auto}
+    @media(min-width:600px){.modal{border-radius:18px}}
+    .modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.08em;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+
+    /* STAT */
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+    .stat-box{background:var(--bg-el);border:1px solid var(--border);border-radius:11px;padding:14px 12px;text-align:center}
+    .stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:var(--accent);line-height:1}
+    .stat-lbl{font-size:.67rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);margin-top:4px}
+
+    /* MISC */
+    .section-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+    .empty{text-align:center;padding:48px 20px;color:var(--text-3)}
+    .empty-icon{font-size:2.5rem;margin-bottom:12px}
+    .empty p{font-size:.9rem}
+    .alert{padding:11px 15px;border-radius:9px;font-size:.86rem;margin-bottom:14px}
+    .a-error{background:rgba(255,69,96,.1);border:1px solid rgba(255,69,96,.28);color:var(--red)}
+    .a-success{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.28);color:var(--accent)}
+    .a-info{background:rgba(77,166,255,.1);border:1px solid rgba(77,166,255,.28);color:var(--blue)}
+    .a-warn{background:rgba(255,210,48,.1);border:1px solid rgba(255,210,48,.28);color:var(--yellow)}
+    .spinner-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
+    .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .gap-8{gap:8px}
+    .hidden{display:none!important}
+    .text-accent{color:var(--accent)}
+    .text-muted{color:var(--text-2)}
+    .text-sm{font-size:.85rem}
+    .text-center{text-align:center}
+    .mt-8{margin-top:8px}
+    .mt-12{margin-top:12px}
+    .mb-8{margin-bottom:8px}
+    .mb-12{margin-bottom:12px}
+    .mb-16{margin-bottom:16px}
+    .mb-20{margin-bottom:20px}
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes slideUp{from{transform:translateY(22px);opacity:0}to{transform:translateY(0);opacity:1}}
+    ::-webkit-scrollbar{width:4px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:2px}
+
+    /* pending-approval highlight */
+    .match-card.needs-action{border-color:rgba(255,210,48,.35);background:rgba(255,210,48,.04)}
+    .approval-bar{display:flex;gap:4px;margin-top:8px;justify-content:center}
+    .apv-dot{width:8px;height:8px;border-radius:50%;background:var(--bg-el);border:1px solid var(--border-hi)}
+    .apv-dot.approved{background:var(--accent)}
+
+    /* username change */
+    .inline-edit{display:flex;align-items:center;gap:8px}
+    .inline-edit .fi{flex:1}
+
+    /* form-check */
+    .fcheck{display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px}
+    .fcheck input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+    .fcheck span{font-size:.8rem;color:var(--text-2)}
+  </style>
 </head>
 <body>
-  <div id="app">
-    <div class="spinner-wrap"><div class="spinner"></div></div>
-  </div>
+<div id="app"><div class="spinner-wrap"><div class="spinner"></div></div></div>
 
-  <!-- Firebase CDN -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, getDocs, addDoc, updateDoc, collection, query, where, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signOut, onAuthStateChanged, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc, getDocs, addDoc, updateDoc, deleteDoc,
+  collection, query, where, serverTimestamp, onSnapshot, writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // ─── FIREBASE CONFIG ───────────────────────────────────────────────────────
-    const firebaseConfig = {
-      apiKey: "AIzaSyCII19pXF_SLL2Tkjw3FeaPxYHNQ_b3J_Q",
-      authDomain: "turnuva-kaeru.firebaseapp.com",
-      projectId: "turnuva-kaeru",
-      storageBucket: "turnuva-kaeru.firebasestorage.app",
-      messagingSenderId: "2078204583",
-      appId: "1:2078204583:web:2c83665f82417e3e843182"
-    };
+// ── FIREBASE ──────────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyCII19pXF_SLL2Tkjw3FeaPxYHNQ_b3J_Q",
+  authDomain: "turnuva-kaeru.firebaseapp.com",
+  projectId: "turnuva-kaeru",
+  storageBucket: "turnuva-kaeru.firebasestorage.app",
+  messagingSenderId: "2078204583",
+  appId: "1:2078204583:web:2c83665f82417e3e843182"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentUser = null;
+let userProfile = null;
+let currentTournament = null;
+let currentMatches = [];
+let currentPage = 'home'; // home | tournament
+let currentTab = 'standings';
+let unsubMatches = null;
+let unsubTournament = null;
 
-    // ─── STATE ─────────────────────────────────────────────────────────────────
-    let currentUser = null;
-    let userProfile = null;
-    let currentTournament = null;
-    let currentMatches = [];
-    let currentPage = 'home'; // home | tournament
-    let currentTab = 'standings'; // standings | fixtures | stats | h2h | admin
-    let fixtureFilter = 'all';
+// ── ROUTER ────────────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  if (user) {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    userProfile = snap.exists() ? snap.data() : null;
+  }
+  renderApp();
+});
 
-    // ─── ROUTER ────────────────────────────────────────────────────────────────
-    onAuthStateChanged(auth, async (user) => {
-      currentUser = user;
-      if (user) {
-        const snap = await getDoc(doc(db, 'users', user.uid));
-        userProfile = snap.exists() ? snap.data() : null;
-        renderApp();
-      } else {
-        renderApp();
-      }
-    });
+function renderApp() {
+  const app = document.getElementById('app');
+  if (!currentUser) { app.innerHTML = renderAuth(); bindAuth(); return; }
+  if (currentPage === 'home') { app.innerHTML = renderLayout(renderHome()); bindHome(); return; }
+  if (currentPage === 'tournament') { app.innerHTML = renderLayout(renderTournamentShell()); bindNav(); subscribeTournament(); return; }
+}
 
-    function renderApp() {
-      const app = document.getElementById('app');
-      if (!currentUser) { app.innerHTML = renderAuth(); bindAuth(); return; }
-      if (currentPage === 'home') { app.innerHTML = renderLayout(renderHome()); bindHome(); return; }
-      if (currentPage === 'tournament') { app.innerHTML = renderLayout(renderTournamentSkeleton()); bindNav(); loadTournamentPage(); return; }
-    }
+function renderLayout(content) {
+  const uname = userProfile?.username || currentUser?.displayName || 'Oyuncu';
+  return `
+    <nav class="nav">
+      <a class="nav-brand" id="go-home">⚽ <span>PES</span> LİGİ</a>
+      <div class="nav-right">
+        <span class="nav-user">${uname}</span>
+        <button class="btn btn-ghost btn-sm" id="change-name-btn">✏️ Ad</button>
+        <button class="btn btn-ghost btn-sm" id="logout-btn">Çıkış</button>
+      </div>
+    </nav>
+    <main class="main" id="main-content">${content}</main>
+  `;
+}
 
-    function renderLayout(content) {
-      const username = userProfile?.username || currentUser?.displayName || 'Oyuncu';
-      return `
-        <nav class="navbar">
-          <a class="navbar-brand" id="go-home">⚽ <span>PES</span> LİGİ</a>
-          <div class="navbar-actions">
-            <span class="nav-user">${username}</span>
-            <button class="btn btn-ghost btn-sm" id="logout-btn">Çıkış</button>
+function bindNav() {
+  document.getElementById('go-home')?.addEventListener('click', () => {
+    cleanupListeners();
+    currentPage = 'home'; currentTournament = null;
+    currentMatches = []; renderApp();
+  });
+  document.getElementById('logout-btn')?.addEventListener('click', () => { cleanupListeners(); signOut(auth); });
+  document.getElementById('change-name-btn')?.addEventListener('click', showChangeNameModal);
+}
+
+function cleanupListeners() {
+  if (unsubMatches) { unsubMatches(); unsubMatches = null; }
+  if (unsubTournament) { unsubTournament(); unsubTournament = null; }
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+// We use username@pes.local as the "email" internally — users never see this
+function renderAuth() {
+  return `
+  <div class="auth-wrap">
+    <div class="auth-glow"></div>
+    <div class="auth-inner">
+      <div class="auth-brand">
+        <div class="auth-icon">🏆</div>
+        <h1 class="display" style="font-size:2.4rem">PES <span class="text-accent">LİGİ</span></h1>
+        <p class="text-muted text-sm" style="margin-top:6px">Kanka turnuvası</p>
+      </div>
+      <div class="card">
+        <div style="padding:24px">
+          <div id="auth-error"></div>
+          <div class="fg">
+            <label class="fl">Kullanıcı Adı</label>
+            <input class="fi" id="f-user" placeholder="mesela: kaeru" autocomplete="username" />
           </div>
-        </nav>
-        <main class="main-content" id="main-content">
-          ${content}
-        </main>
-      `;
-    }
-
-    function bindNav() {
-      document.getElementById('go-home')?.addEventListener('click', () => {
-        currentPage = 'home'; currentTournament = null; renderApp();
-      });
-      document.getElementById('logout-btn')?.addEventListener('click', () => signOut(auth));
-    }
-
-    // ─── AUTH ──────────────────────────────────────────────────────────────────
-    function renderAuth() {
-      return `
-        <div class="auth-wrap">
-          <div class="auth-glow"></div>
-          <div class="auth-inner">
-            <div class="auth-brand">
-              <div class="auth-icon">🏆</div>
-              <h1 class="display">PES <span class="text-accent">LİGİ</span></h1>
-              <p class="text-muted text-sm">Turnuva takip platformu</p>
-            </div>
-            <div class="card">
-              <div style="padding:24px">
-                <div class="tabs mb-16" id="auth-tabs">
-                  <button class="tab active" data-mode="login">Giriş Yap</button>
-                  <button class="tab" data-mode="register">Kayıt Ol</button>
-                </div>
-                <div id="auth-error"></div>
-                <form id="auth-form">
-                  <div id="username-field" class="form-group" style="display:none">
-                    <label class="form-label">Kullanıcı Adı</label>
-                    <input class="form-input" id="f-username" placeholder="kanka123" />
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input class="form-input" id="f-email" type="email" placeholder="sen@email.com" required />
-                  </div>
-                  <div class="form-group" style="margin-bottom:20px">
-                    <label class="form-label">Şifre</label>
-                    <input class="form-input" id="f-password" type="password" placeholder="••••••••" required />
-                  </div>
-                  <button class="btn btn-primary btn-full btn-lg" type="submit" id="auth-submit">Giriş Yap</button>
-                </form>
-              </div>
-            </div>
+          <div class="fg" style="margin-bottom:20px">
+            <label class="fl">Şifre</label>
+            <input class="fi" id="f-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
           </div>
+          <button class="btn btn-primary btn-full btn-lg" id="auth-submit">Giriş Yap</button>
+          <p class="text-muted text-sm text-center" style="margin-top:14px">Hesabın yoksa otomatik oluşturulur</p>
         </div>
-      `;
-    }
+      </div>
+    </div>
+  </div>`;
+}
 
-    function bindAuth() {
-      let mode = 'login';
-      document.querySelectorAll('#auth-tabs .tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          mode = btn.dataset.mode;
-          document.querySelectorAll('#auth-tabs .tab').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          document.getElementById('username-field').style.display = mode === 'register' ? 'block' : 'none';
-          document.getElementById('auth-submit').textContent = mode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
-        });
-      });
-
-      document.getElementById('auth-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const errEl = document.getElementById('auth-error');
-        errEl.innerHTML = '';
-        const email = document.getElementById('f-email').value;
-        const password = document.getElementById('f-password').value;
-        const username = document.getElementById('f-username').value.trim();
-        const btn = document.getElementById('auth-submit');
-        btn.disabled = true; btn.textContent = 'Bekle...';
-        try {
-          if (mode === 'register') {
-            if (!username) throw { message: 'Kullanıcı adı gerekli' };
-            const res = await createUserWithEmailAndPassword(auth, email, password);
-            await updateProfile(res.user, { displayName: username });
-            await setDoc(doc(db, 'users', res.user.uid), {
-              uid: res.user.uid, username, email, createdAt: new Date(),
-            });
-          } else {
-            await signInWithEmailAndPassword(auth, email, password);
-          }
-        } catch (err) {
-          const msgs = {
-            'auth/email-already-in-use': 'Bu email zaten kayıtlı',
-            'auth/invalid-email': 'Geçersiz email',
-            'auth/weak-password': 'Şifre en az 6 karakter olmalı',
-            'auth/invalid-credential': 'Email veya şifre hatalı',
-          };
-          errEl.innerHTML = `<div class="alert alert-error">${msgs[err.code] || err.message || 'Bir hata oluştu'}</div>`;
-          btn.disabled = false;
-          btn.textContent = mode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
-        }
-      });
-    }
-
-    // ─── HOME ──────────────────────────────────────────────────────────────────
-    function renderHome(tournaments = [], loading = true) {
-      const username = userProfile?.username || currentUser?.displayName || 'Oyuncu';
-      return `
-        <div class="accent-line"></div>
-        <h1 class="display" style="font-size:1.8rem;letter-spacing:.06em">
-          HOŞ GELDİN, <span class="text-accent">${username.toUpperCase()}</span>
-        </h1>
-        <p class="text-muted text-sm mt-8 mb-24">Turnuvalarını yönet ve takip et</p>
-
-        <div class="grid-2 mb-24">
-          <button class="btn btn-primary btn-lg" id="open-create">＋ Turnuva Oluştur</button>
-          <button class="btn btn-secondary btn-lg" id="open-join"># Katıl</button>
-        </div>
-
-        <div class="section-title">🏆 Turnuvalarım</div>
-
-        <div id="tournament-list">
-          ${loading ? '<div class="spinner" style="margin:32px auto"></div>' : renderTournamentList(tournaments)}
-        </div>
-
-        <!-- Create Modal -->
-        <div class="modal-overlay hidden" id="modal-create">
-          <div class="modal">
-            <div class="modal-title">Yeni Turnuva <button class="btn btn-ghost btn-sm modal-close">✕</button></div>
-            <div id="create-error"></div>
-            <form id="create-form">
-              <div class="form-group">
-                <label class="form-label">Turnuva Adı</label>
-                <input class="form-input" id="c-name" placeholder="Kuzin Ligi 2025" required />
-              </div>
-              <p class="text-muted text-sm mb-16">Oluşturulunca bir join kodu alacaksın.</p>
-              <button class="btn btn-primary btn-full" type="submit" id="create-submit">Oluştur</button>
-            </form>
-          </div>
-        </div>
-
-        <!-- Join Modal -->
-        <div class="modal-overlay hidden" id="modal-join">
-          <div class="modal">
-            <div class="modal-title">Turnuvaya Katıl <button class="btn btn-ghost btn-sm modal-close">✕</button></div>
-            <div id="join-error"></div>
-            <form id="join-form">
-              <div class="form-group">
-                <label class="form-label">Join Kodu</label>
-                <input class="form-input" id="j-code" placeholder="ABC123" maxlength="6" style="text-transform:uppercase;letter-spacing:.2em;font-size:1.1rem" required />
-              </div>
-              <button class="btn btn-primary btn-full" type="submit" id="join-submit">Katıl</button>
-            </form>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderTournamentList(tournaments) {
-      if (!tournaments.length) return `
-        <div class="empty-state">
-          <div class="empty-state-icon">⚽</div>
-          <p>Henüz bir turnuvan yok.</p>
-          <p class="mt-8">Oluştur veya join kodu ile katıl!</p>
-        </div>`;
-      return tournaments.map(t => {
-        const isAdmin = t.adminUid === currentUser.uid;
-        const statusMap = { waiting: ['badge-yellow','Bekleniyor'], active: ['badge-green','⚡ Aktif'], finished: ['badge-gray','Bitti'] };
-        const [cls, label] = statusMap[t.status] || statusMap.waiting;
-        return `
-          <div class="tournament-item" data-id="${t.id}">
-            <div class="tournament-icon">🏆</div>
-            <div class="tournament-info">
-              <div class="tournament-name">
-                ${t.name}
-                ${isAdmin ? '<span class="badge badge-blue" style="font-size:.6rem">ADMİN</span>' : ''}
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-                <span class="badge ${cls}">${label}</span>
-                <span class="text-muted" style="font-size:.78rem">👥 ${t.players?.length || 0} oyuncu</span>
-                ${t.status === 'waiting' ? `<span style="color:var(--text-muted);font-size:.78rem;font-family:'Bebas Neue';letter-spacing:.1em">${t.joinCode}</span>` : ''}
-              </div>
-            </div>
-            <span style="color:var(--text-muted)">›</span>
-          </div>`;
-      }).join('');
-    }
-
-    async function bindHome() {
-      bindNav();
-      // Load tournaments
-      const list = await getUserTournaments();
-      document.getElementById('tournament-list').innerHTML = renderTournamentList(list);
-      document.querySelectorAll('.tournament-item').forEach(el => {
-        el.addEventListener('click', () => {
-          currentPage = 'tournament';
-          currentTournament = el.dataset.id;
-          currentTab = 'standings';
-          renderApp();
-        });
-      });
-
-      // Modals
-      document.getElementById('open-create').addEventListener('click', () => document.getElementById('modal-create').classList.remove('hidden'));
-      document.getElementById('open-join').addEventListener('click', () => document.getElementById('modal-join').classList.remove('hidden'));
-      document.querySelectorAll('.modal-close').forEach(btn => {
-        btn.addEventListener('click', () => btn.closest('.modal-overlay').classList.add('hidden'));
-      });
-      document.querySelectorAll('.modal-overlay').forEach(el => {
-        el.addEventListener('click', e => { if (e.target === el) el.classList.add('hidden'); });
-      });
-
-      // Create
-      document.getElementById('create-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('create-submit');
-        btn.disabled = true; btn.textContent = 'Oluşturuluyor...';
-        try {
-          const name = document.getElementById('c-name').value;
-          const username = userProfile?.username || currentUser.displayName;
-          await createTournament(username, name);
-          currentPage = 'home'; renderApp();
-        } catch (err) {
-          document.getElementById('create-error').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
-          btn.disabled = false; btn.textContent = 'Oluştur';
-        }
-      });
-
-      // Join
-      document.getElementById('join-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('join-submit');
-        btn.disabled = true; btn.textContent = 'Katılıyor...';
-        try {
-          const code = document.getElementById('j-code').value.toUpperCase();
-          const username = userProfile?.username || currentUser.displayName;
-          await joinTournament(code, username);
-          currentPage = 'home'; renderApp();
-        } catch (err) {
-          document.getElementById('join-error').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
-          btn.disabled = false; btn.textContent = 'Katıl';
-        }
-      });
-    }
-
-    // ─── TOURNAMENT PAGE ───────────────────────────────────────────────────────
-    function renderTournamentSkeleton() {
-      return `<div class="spinner" style="margin:60px auto"></div>`;
-    }
-
-    async function loadTournamentPage() {
+function bindAuth() {
+  document.getElementById('auth-submit').addEventListener('click', async () => {
+    const errEl = document.getElementById('auth-error');
+    errEl.innerHTML = '';
+    const username = document.getElementById('f-user').value.trim().toLowerCase();
+    const password = document.getElementById('f-pass').value;
+    const btn = document.getElementById('auth-submit');
+    if (!username) { errEl.innerHTML = `<div class="alert a-error">Kullanıcı adı gir</div>`; return; }
+    if (!password) { errEl.innerHTML = `<div class="alert a-error">Şifre gir</div>`; return; }
+    const fakeEmail = `${username}@pes.local`;
+    btn.disabled = true; btn.textContent = 'Bekle...';
+    try {
+      // Try login first
       try {
-        const [t, m] = await Promise.all([getTournament(currentTournament), getMatches(currentTournament)]);
-        window._t = t; window._m = m;
-        document.getElementById('main-content').innerHTML = renderTournamentPage(t, m);
-        bindTournamentPage(t, m);
-      } catch(e) {
-        document.getElementById('main-content').innerHTML = `<div class="alert alert-error">Turnuva yüklenemedi: ${e.message}</div>`;
-      }
-    }
-
-    function renderTournamentPage(t, m) {
-      const isAdmin = t.adminUid === currentUser.uid;
-      const tabs = [
-        { id:'standings', label:'Puan' },
-        { id:'fixtures', label:'Maçlar' },
-        { id:'stats', label:'İstat' },
-        { id:'h2h', label:'H2H' },
-        ...(isAdmin ? [{ id:'admin', label:'Admin' }] : []),
-      ];
-
-      return `
-        <button class="btn btn-ghost btn-sm mb-12" id="back-btn" style="padding-left:6px">‹ Geri</button>
-        <div class="accent-line"></div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px">
-          <div>
-            <h1 class="display" style="font-size:1.6rem;letter-spacing:.06em;line-height:1.1">${t.name.toUpperCase()}</h1>
-            <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
-              ${t.status==='waiting' ? '<span class="badge badge-yellow">Bekleniyor</span>' : ''}
-              ${t.status==='active' ? '<span class="badge badge-green">⚡ Aktif</span>' : ''}
-              ${t.status==='finished' ? '<span class="badge badge-gray">Tamamlandı</span>' : ''}
-              <span class="text-muted" style="font-size:.78rem">👥 ${t.players?.length||0} oyuncu</span>
-            </div>
-          </div>
-          ${t.status==='waiting' ? `
-            <div class="join-code-box" id="copy-code" data-code="${t.joinCode}">
-              <div class="join-code-text">${t.joinCode}</div>
-              <div class="join-code-hint" id="copy-hint">📋 Kopyala</div>
-            </div>` : ''}
-        </div>
-
-        <div class="tabs mb-16" id="main-tabs">
-          ${tabs.map(tb => `<button class="tab ${tb.id===currentTab?'active':''}" data-tab="${tb.id}">${tb.label}</button>`).join('')}
-        </div>
-
-        <div id="tab-content">
-          ${renderTab(t, m, currentTab)}
-        </div>
-
-        ${renderMatchModal()}
-      `;
-    }
-
-    function renderTab(t, m, tab) {
-      const standings = calcStandings(t.players||[], m);
-      if (tab === 'standings') return renderStandings(standings);
-      if (tab === 'fixtures') return renderFixtures(m);
-      if (tab === 'stats') return renderStats(standings, m);
-      if (tab === 'h2h') return renderH2H(t.players||[], m);
-      if (tab === 'admin') return renderAdmin(t, m);
-      return '';
-    }
-
-    function bindTournamentPage(t, m) {
-      document.getElementById('back-btn')?.addEventListener('click', () => {
-        currentPage = 'home'; currentTournament = null; renderApp();
-      });
-      document.getElementById('logout-btn')?.addEventListener('click', () => signOut(auth));
-      document.getElementById('go-home')?.addEventListener('click', () => {
-        currentPage = 'home'; currentTournament = null; renderApp();
-      });
-
-      // Copy code
-      document.getElementById('copy-code')?.addEventListener('click', function() {
-        navigator.clipboard.writeText(this.dataset.code).catch(()=>{});
-        document.getElementById('copy-hint').textContent = '✅ Kopyalandı';
-        setTimeout(() => { if(document.getElementById('copy-hint')) document.getElementById('copy-hint').textContent = '📋 Kopyala'; }, 2000);
-      });
-
-      // Tabs
-      document.querySelectorAll('#main-tabs .tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          currentTab = btn.dataset.tab;
-          document.querySelectorAll('#main-tabs .tab').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          document.getElementById('tab-content').innerHTML = renderTab(t, m, currentTab);
-          bindTabContent(t, m);
-        });
-      });
-
-      bindTabContent(t, m);
-    }
-
-    function bindTabContent(t, m) {
-      // Fixture filter
-      document.querySelectorAll('.fix-filter').forEach(btn => {
-        btn.addEventListener('click', () => {
-          fixtureFilter = btn.dataset.filter;
-          document.querySelectorAll('.fix-filter').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          document.getElementById('fixture-list').innerHTML = renderFixtureList(m, fixtureFilter);
-          bindFixtureActions(t, m);
-        });
-      });
-      bindFixtureActions(t, m);
-
-      // H2H selects
-      document.getElementById('h2h-p1')?.addEventListener('change', () => updateH2H(t, m));
-      document.getElementById('h2h-p2')?.addEventListener('change', () => updateH2H(t, m));
-
-      // Admin generate
-      document.getElementById('gen-fixture-btn')?.addEventListener('click', async () => {
-        if (t.players.length < 2) return alert('En az 2 oyuncu gerekli');
-        if (!confirm(`${t.players.length} oyuncu için fikstür oluşturulsun mu?`)) return;
-        const btn = document.getElementById('gen-fixture-btn');
-        btn.disabled = true; btn.textContent = 'Oluşturuluyor...';
-        try {
-          await generateFixture(t.id, t.players);
-          await loadTournamentPage();
-        } catch(e) { alert(e.message); btn.disabled = false; btn.textContent = 'Fikstürü Oluştur'; }
-      });
-    }
-
-    function bindFixtureActions(t, m) {
-      // Submit result buttons
-      document.querySelectorAll('.submit-result-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const matchId = btn.dataset.id;
-          const match = m.find(x => x.id === matchId);
-          if (match) openMatchModal(match, t, m);
-        });
-      });
-
-      // Confirm
-      document.querySelectorAll('.confirm-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          btn.disabled = true; btn.textContent = '...';
-          await confirmMatch(btn.dataset.id);
-          await loadTournamentPage();
-        });
-      });
-
-      // Dispute
-      document.querySelectorAll('.dispute-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          btn.disabled = true;
-          await disputeMatch(btn.dataset.id);
-          await loadTournamentPage();
-        });
-      });
-    }
-
-    // ─── STANDINGS ─────────────────────────────────────────────────────────────
-    function renderStandings(standings) {
-      if (!standings.length) return `<div class="empty-state"><div class="empty-state-icon">🏆</div><p>Henüz puan tablosu yok</p></div>`;
-      return `
-        <div class="card" style="overflow-x:auto">
-          <table class="standings-table">
-            <thead><tr>
-              <th>#</th><th style="text-align:left">Oyuncu</th>
-              <th>O</th><th>G</th><th>B</th><th>M</th>
-              <th>GA</th><th>Av</th><th style="color:var(--accent)">P</th>
-            </tr></thead>
-            <tbody>
-              ${standings.map((p,i) => `
-                <tr>
-                  <td><span class="rank-badge rank-${i<3?i+1:'other'}">${i+1}</span></td>
-                  <td><div class="player-cell"><div class="player-avatar">${p.username[0].toUpperCase()}</div><span style="font-weight:600;font-size:.9rem">${p.username}</span></div></td>
-                  <td style="color:var(--text-secondary)">${p.played}</td>
-                  <td style="color:var(--accent)">${p.won}</td>
-                  <td style="color:var(--text-secondary)">${p.drawn}</td>
-                  <td style="color:var(--red)">${p.lost}</td>
-                  <td style="color:var(--text-secondary);font-size:.82rem">${p.goalsFor}:${p.goalsAgainst}</td>
-                  <td style="color:${p.goalDiff>=0?'var(--accent)':'var(--red)'};font-size:.85rem">${p.goalDiff>0?'+':''}${p.goalDiff}</td>
-                  <td style="font-weight:700;font-size:1rem;font-family:'Bebas Neue';letter-spacing:.05em">${p.points}</td>
-                </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>`;
-    }
-
-    // ─── FIXTURES ──────────────────────────────────────────────────────────────
-    function renderFixtures(m) {
-      if (!m.length) return `<div class="empty-state"><div class="empty-state-icon">📅</div><p>Fikstür henüz oluşturulmadı</p></div>`;
-      const submitted = m.filter(x => x.status === 'submitted').length;
-      return `
-        <div class="tabs mb-16" id="fix-tabs">
-          <button class="fix-filter tab ${fixtureFilter==='all'?'active':''}" data-filter="all">Tümü</button>
-          <button class="fix-filter tab ${fixtureFilter==='pending'?'active':''}" data-filter="pending">
-            Bekleyen${submitted>0?` <span class="red-dot">${submitted}</span>`:''}
-          </button>
-          <button class="fix-filter tab ${fixtureFilter==='done'?'active':''}" data-filter="done">Tamamlanan</button>
-        </div>
-        <div id="fixture-list">
-          ${renderFixtureList(m, fixtureFilter)}
-        </div>`;
-    }
-
-    function renderFixtureList(m, filter) {
-      let list = m;
-      if (filter === 'pending') list = m.filter(x => x.status !== 'confirmed');
-      if (filter === 'done') list = m.filter(x => x.status === 'confirmed');
-      if (!list.length) return `<div class="empty-state"><p>Bu filtrede maç yok</p></div>`;
-      return list.map(match => renderMatchCard(match)).join('');
-    }
-
-    function renderMatchCard(m) {
-      const isConfirmed = m.status === 'confirmed';
-      const isSubmitted = m.status === 'submitted';
-      const isDisputed = m.status === 'disputed';
-      const isMyMatch = m.homeUid === currentUser.uid || m.awayUid === currentUser.uid;
-      const canSubmit = (m.status === 'pending' || m.status === 'disputed') && isMyMatch;
-      const canConfirm = isSubmitted && m.submittedBy !== currentUser.uid && isMyMatch;
-
-      let statusBadge = '';
-      if (isConfirmed) statusBadge = '<span class="badge badge-green">✓ Onaylandı</span>';
-      else if (isSubmitted) statusBadge = '<span class="badge badge-yellow">⏳ Onay Bekliyor</span>';
-      else if (isDisputed) statusBadge = '<span class="badge badge-red">⚠ İtiraz</span>';
-      else statusBadge = '<span class="badge badge-gray">Oynanmadı</span>';
-
-      const score = (isConfirmed || isSubmitted)
-        ? `<div class="match-score">${m.homeGoals} <span class="match-score-sep">—</span> ${m.awayGoals}</div>`
-        : `<div class="match-vs">VS</div>`;
-
-      const redCardInfo = isConfirmed && (m.homeRedCards > 0 || m.awayRedCards > 0) ? `
-        <div style="display:flex;justify-content:center;gap:16px;margin-top:6px;flex-wrap:wrap">
-          ${m.homeRedCards > 0 ? `<span style="font-size:.72rem;color:var(--red)">🟥 ${m.homeName}: ${m.homeRedCards}${m.deductHomeRed?' (averajdan düşüldü)':''}</span>` : ''}
-          ${m.awayRedCards > 0 ? `<span style="font-size:.72rem;color:var(--red)">🟥 ${m.awayName}: ${m.awayRedCards}${m.deductAwayRed?' (averajdan düşüldü)':''}</span>` : ''}
-        </div>` : '';
-
-      const actions = canSubmit ? `
-        <div style="margin-top:10px">
-          <button class="btn btn-primary btn-sm btn-full submit-result-btn" data-id="${m.id}">Sonuç Gir</button>
-        </div>` :
-        canConfirm ? `
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn btn-primary btn-sm confirm-btn" data-id="${m.id}" style="flex:1">✓ Onayla</button>
-          <button class="btn btn-danger btn-sm dispute-btn" data-id="${m.id}" style="flex:1">✕ İtiraz</button>
-        </div>` :
-        isSubmitted && m.submittedBy === currentUser.uid ? `
-        <p style="text-align:center;color:var(--text-muted);font-size:.75rem;margin-top:8px">Rakibinin onayı bekleniyor...</p>` : '';
-
-      return `
-        <div class="match-card ${isMyMatch && !isConfirmed ? 'match-card-highlight' : ''}">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="match-team">
-              <div class="player-avatar" style="margin:0 auto 4px;width:26px;height:26px;font-size:.65rem">${m.homeName[0].toUpperCase()}</div>
-              <div class="match-team-name">${m.homeName}</div>
-            </div>
-            <div style="text-align:center;flex-shrink:0">
-              ${score}
-              ${statusBadge}
-            </div>
-            <div class="match-team">
-              <div class="player-avatar" style="margin:0 auto 4px;width:26px;height:26px;font-size:.65rem">${m.awayName[0].toUpperCase()}</div>
-              <div class="match-team-name">${m.awayName}</div>
-            </div>
-          </div>
-          ${redCardInfo}
-          ${actions}
-        </div>`;
-    }
-
-    // ─── STATS ─────────────────────────────────────────────────────────────────
-    function renderStats(standings, m) {
-      const confirmed = m.filter(x => x.status === 'confirmed');
-      const totalGoals = confirmed.reduce((s,x) => s + x.homeGoals + x.awayGoals, 0);
-      const totalRed = confirmed.reduce((s,x) => s + x.homeRedCards + x.awayRedCards, 0);
-      const avgGoals = confirmed.length ? (totalGoals/confirmed.length).toFixed(1) : '—';
-      const topScorer = [...standings].sort((a,b) => b.goalsFor-a.goalsFor)[0];
-      const bestDef = [...standings].sort((a,b) => a.goalsAgainst-b.goalsAgainst)[0];
-      const mostRed = [...standings].sort((a,b) => b.redCards-a.redCards)[0];
-
-      return `
-        <div class="stat-grid mb-16">
-          <div class="stat-box"><div class="stat-value">${confirmed.length}</div><div class="stat-label">Maç</div></div>
-          <div class="stat-box"><div class="stat-value">${totalGoals}</div><div class="stat-label">Toplam Gol</div></div>
-          <div class="stat-box"><div class="stat-value" style="font-size:1.4rem">${avgGoals}</div><div class="stat-label">Maç Başı Gol</div></div>
-          <div class="stat-box"><div class="stat-value" style="color:var(--red)">${totalRed}</div><div class="stat-label">Kırmızı Kart</div></div>
-        </div>
-
-        <div class="card mb-16">
-          <div class="card-header"><span class="card-title">🏅 Liderler</span></div>
-          ${[
-            ['⚽ En Çok Gol', topScorer, `${topScorer?.goalsFor??0} gol`],
-            ['🛡️ En İyi Savunma', bestDef, `${bestDef?.goalsAgainst??0} yenilen`],
-            ['🟥 En Çok Kırmızı', mostRed, `${mostRed?.redCards??0} kart`],
-          ].map(([label,player,val],i) => `
-            <div style="padding:14px 20px;${i<2?'border-bottom:1px solid var(--border)':''};display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:2px">${label}</div>
-                <div style="font-weight:700">${player?.username??'—'}</div>
-              </div>
-              <div style="font-family:'Bebas Neue';font-size:1.2rem;color:var(--accent)">${val}</div>
-            </div>`).join('')}
-        </div>
-
-        <div class="card" style="overflow-x:auto">
-          <div class="card-header"><span class="card-title">📊 Oyuncu Detay</span></div>
-          <table class="standings-table">
-            <thead><tr><th style="text-align:left">Oyuncu</th><th>Gol</th><th>Yenilen</th><th>Av</th><th>🟥</th><th>G%</th></tr></thead>
-            <tbody>
-              ${standings.map(p => `
-                <tr>
-                  <td><div class="player-cell"><div class="player-avatar">${p.username[0].toUpperCase()}</div>${p.username}</div></td>
-                  <td style="color:var(--accent)">${p.goalsFor}</td>
-                  <td style="color:var(--text-secondary)">${p.goalsAgainst}</td>
-                  <td style="color:${p.goalDiff>=0?'var(--accent)':'var(--red)'}">${p.goalDiff>0?'+':''}${p.goalDiff}</td>
-                  <td style="color:var(--red)">${p.redCards}</td>
-                  <td style="color:var(--text-secondary);font-size:.85rem">${p.played>0?Math.round(p.won/p.played*100)+'%':'—'}</td>
-                </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>`;
-    }
-
-    // ─── H2H ───────────────────────────────────────────────────────────────────
-    function renderH2H(players, m) {
-      return `
-        <div class="card mb-16">
-          <div class="card-body">
-            <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:flex-end">
-              <div class="form-group" style="margin-bottom:0">
-                <label class="form-label">Oyuncu 1</label>
-                <select class="form-input" id="h2h-p1">
-                  <option value="">Seç</option>
-                  ${players.map(p => `<option value="${p.uid}">${p.username}</option>`).join('')}
-                </select>
-              </div>
-              <div style="padding-bottom:4px;color:var(--text-muted);font-family:'Bebas Neue';font-size:1.2rem">VS</div>
-              <div class="form-group" style="margin-bottom:0">
-                <label class="form-label">Oyuncu 2</label>
-                <select class="form-input" id="h2h-p2">
-                  <option value="">Seç</option>
-                  ${players.map(p => `<option value="${p.uid}">${p.username}</option>`).join('')}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div id="h2h-result">
-          <div class="empty-state"><div class="empty-state-icon">⚔️</div><p>İki oyuncu seç</p></div>
-        </div>`;
-    }
-
-    function updateH2H(t, m) {
-      const p1 = document.getElementById('h2h-p1')?.value;
-      const p2 = document.getElementById('h2h-p2')?.value;
-      const el = document.getElementById('h2h-result');
-      if (!p1 || !p2 || p1 === p2) { el.innerHTML = `<div class="empty-state"><p>Farklı iki oyuncu seç</p></div>`; return; }
-
-      const h2hM = m.filter(x => x.status==='confirmed' && ((x.homeUid===p1&&x.awayUid===p2)||(x.homeUid===p2&&x.awayUid===p1)));
-      let p1w=0,p2w=0,draws=0;
-      h2hM.forEach(x => {
-        const hg = x.deductHomeRed?Math.max(0,x.homeGoals-x.homeRedCards):x.homeGoals;
-        const ag = x.deductAwayRed?Math.max(0,x.awayGoals-x.awayRedCards):x.awayGoals;
-        const p1g = x.homeUid===p1?hg:ag, p2g = x.homeUid===p1?ag:hg;
-        if(p1g>p2g)p1w++; else if(p2g>p1g)p2w++; else draws++;
-      });
-
-      const p1name = t.players.find(p=>p.uid===p1)?.username||'';
-      const p2name = t.players.find(p=>p.uid===p2)?.username||'';
-
-      el.innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-bottom:16px">
-          <div class="stat-box"><div class="stat-value" style="color:var(--accent)">${p1w}</div><div class="stat-label">${p1name}</div></div>
-          <div class="stat-box"><div class="stat-value" style="color:var(--text-secondary)">${draws}</div><div class="stat-label">Beraberlik</div></div>
-          <div class="stat-box"><div class="stat-value" style="color:var(--blue)">${p2w}</div><div class="stat-label">${p2name}</div></div>
-        </div>
-        ${h2hM.length ? h2hM.map(x=>`
-          <div class="match-card">
-            <div style="display:flex;align-items:center;gap:8px;width:100%">
-              <div class="match-team"><div class="match-team-name">${x.homeName}</div></div>
-              <div class="match-score">${x.homeGoals}<span class="match-score-sep">—</span>${x.awayGoals}</div>
-              <div class="match-team"><div class="match-team-name">${x.awayName}</div></div>
-            </div>
-          </div>`).join('') : '<div class="empty-state"><p>Henüz karşılaşma yok</p></div>'}`;
-    }
-
-    // ─── ADMIN ─────────────────────────────────────────────────────────────────
-    function renderAdmin(t, m) {
-      return `
-        <div class="card mb-16">
-          <div class="card-header"><span class="card-title">🔑 Join Kodu</span></div>
-          <div class="card-body">
-            <div class="join-code">${t.joinCode}</div>
-            <p class="text-muted text-sm text-center">Bu kodu arkadaşlarınla paylaş</p>
-          </div>
-        </div>
-
-        <div class="card mb-16">
-          <div class="card-header"><span class="card-title">👥 Oyuncular (${t.players?.length})</span></div>
-          ${(t.players||[]).map((p,i) => `
-            <div style="padding:12px 20px;${i<t.players.length-1?'border-bottom:1px solid var(--border)':''};display:flex;align-items:center;gap:12px">
-              <div class="player-avatar">${p.username[0].toUpperCase()}</div>
-              <span style="font-weight:600">${p.username}</span>
-              ${p.uid===t.adminUid?'<span class="badge badge-blue">Admin</span>':''}
-            </div>`).join('')}
-        </div>
-
-        ${!m.length && t.status==='waiting' ? `
-          <div class="card">
-            <div class="card-body">
-              <h3 style="font-family:'Bebas Neue';font-size:1.1rem;margin-bottom:8px">⚡ Fikstür Oluştur</h3>
-              <p class="text-muted text-sm mb-16">Tüm oyuncular katıldıktan sonra lig fikstürünü oluştur.</p>
-              <button class="btn btn-primary btn-full" id="gen-fixture-btn" ${t.players?.length<2?'disabled':''}>
-                Fikstürü Oluştur (${t.players?.length} oyuncu)
-              </button>
-            </div>
-          </div>` : m.length ? `<div class="alert alert-success">✅ Fikstür oluşturuldu — ${m.length} maç</div>` : ''}
-      `;
-    }
-
-    // ─── MATCH MODAL ───────────────────────────────────────────────────────────
-    function renderMatchModal() {
-      return `
-        <div class="modal-overlay hidden" id="modal-match">
-          <div class="modal">
-            <div class="modal-title">Maç Sonucu <button class="btn btn-ghost btn-sm" id="match-modal-close">✕</button></div>
-            <div id="match-modal-body"></div>
-          </div>
-        </div>`;
-    }
-
-    function openMatchModal(match, t, m) {
-      const modal = document.getElementById('modal-match');
-      document.getElementById('match-modal-body').innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-          <div style="text-align:center;flex:1">
-            <div class="player-avatar" style="margin:0 auto 4px">${match.homeName[0].toUpperCase()}</div>
-            <div style="font-weight:700;font-size:.9rem">${match.homeName}</div>
-          </div>
-          <div style="font-family:'Bebas Neue';font-size:1rem;color:var(--text-muted);letter-spacing:.1em">VS</div>
-          <div style="text-align:center;flex:1">
-            <div class="player-avatar" style="margin:0 auto 4px">${match.awayName[0].toUpperCase()}</div>
-            <div style="font-weight:700;font-size:.9rem">${match.awayName}</div>
-          </div>
-        </div>
-        <form id="result-form">
-          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:flex-end;margin-bottom:16px">
-            <div class="form-group" style="margin-bottom:0">
-              <label class="form-label">${match.homeName}</label>
-              <input class="form-input" id="r-hgoals" type="number" min="0" max="99" placeholder="0" required style="text-align:center;font-size:1.5rem;font-family:'Bebas Neue'" />
-            </div>
-            <div style="padding-bottom:2px;color:var(--text-muted);font-family:'Bebas Neue';font-size:1.5rem">—</div>
-            <div class="form-group" style="margin-bottom:0">
-              <label class="form-label">${match.awayName}</label>
-              <input class="form-input" id="r-agoals" type="number" min="0" max="99" placeholder="0" required style="text-align:center;font-size:1.5rem;font-family:'Bebas Neue'" />
-            </div>
-          </div>
-
-          <div style="background:var(--bg-elevated);border-radius:10px;padding:14px;margin-bottom:16px">
-            <div style="font-size:.75rem;font-weight:700;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">🟥 Kırmızı Kartlar (Opsiyonel)</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div>
-                <label class="form-label" style="font-size:.7rem">${match.homeName}</label>
-                <input class="form-input" id="r-hred" type="number" min="0" max="11" value="0" style="text-align:center" />
-                <label class="form-check mt-8" id="r-hdeduct-wrap" style="display:none">
-                  <input type="checkbox" id="r-hdeduct" />
-                  <span style="font-size:.75rem;color:var(--text-secondary)">Averajdan düş</span>
-                </label>
-              </div>
-              <div>
-                <label class="form-label" style="font-size:.7rem">${match.awayName}</label>
-                <input class="form-input" id="r-ared" type="number" min="0" max="11" value="0" style="text-align:center" />
-                <label class="form-check mt-8" id="r-adeduct-wrap" style="display:none">
-                  <input type="checkbox" id="r-adeduct" />
-                  <span style="font-size:.75rem;color:var(--text-secondary)">Averajdan düş</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div class="alert alert-info mb-16" style="font-size:.78rem">ℹ️ Rakibinin onayı gerekecek.</div>
-          <button class="btn btn-primary btn-full" type="submit" id="result-submit">Sonucu Gönder</button>
-        </form>`;
-
-      modal.classList.remove('hidden');
-
-      document.getElementById('match-modal-close').onclick = () => modal.classList.add('hidden');
-      modal.onclick = (e) => { if(e.target===modal) modal.classList.add('hidden'); };
-
-      document.getElementById('r-hred').oninput = function() {
-        document.getElementById('r-hdeduct-wrap').style.display = +this.value > 0 ? 'flex' : 'none';
-      };
-      document.getElementById('r-ared').oninput = function() {
-        document.getElementById('r-adeduct-wrap').style.display = +this.value > 0 ? 'flex' : 'none';
-      };
-
-      document.getElementById('result-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('result-submit');
-        btn.disabled = true; btn.textContent = 'Gönderiliyor...';
-        try {
-          await submitResult(
-            match.id, currentUser.uid,
-            +document.getElementById('r-hgoals').value,
-            +document.getElementById('r-agoals').value,
-            +document.getElementById('r-hred').value,
-            +document.getElementById('r-ared').value,
-            document.getElementById('r-hdeduct').checked,
-            document.getElementById('r-adeduct').checked,
-          );
-          modal.classList.add('hidden');
-          await loadTournamentPage();
-        } catch(err) {
-          alert(err.message);
-          btn.disabled = false; btn.textContent = 'Sonucu Gönder';
+        await signInWithEmailAndPassword(auth, fakeEmail, password);
+      } catch (loginErr) {
+        if (loginErr.code === 'auth/user-not-found' || loginErr.code === 'auth/invalid-credential' || loginErr.code === 'auth/invalid-email') {
+          // Register
+          const res = await createUserWithEmailAndPassword(auth, fakeEmail, password);
+          await updateProfile(res.user, { displayName: username });
+          await setDoc(doc(db, 'users', res.user.uid), { uid: res.user.uid, username, createdAt: new Date() });
+        } else {
+          throw loginErr;
         }
+      }
+    } catch(err) {
+      const msgs = {
+        'auth/wrong-password': 'Şifre yanlış',
+        'auth/weak-password': 'Şifre en az 6 karakter olmalı',
+        'auth/too-many-requests': 'Çok fazla deneme, biraz bekle',
       };
+      errEl.innerHTML = `<div class="alert a-error">${msgs[err.code] || err.message || 'Hata oluştu'}</div>`;
+      btn.disabled = false; btn.textContent = 'Giriş Yap';
     }
+  });
+  document.getElementById('f-pass').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('auth-submit').click(); });
+}
 
-    // ─── FIRESTORE SERVICE ─────────────────────────────────────────────────────
-    async function createTournament(adminName, name) {
-      const code = Math.random().toString(36).substring(2,8).toUpperCase();
-      await addDoc(collection(db,'tournaments'), {
-        name, adminUid: currentUser.uid, adminName, joinCode: code,
-        status: 'waiting', players: [{uid:currentUser.uid,username:adminName}],
-        createdAt: serverTimestamp(),
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function renderHome() {
+  return `
+  <div id="home-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h2 class="display" style="font-size:1.8rem">Turnuvalar</h2>
+      <button class="btn btn-primary" id="new-tournament-btn">+ Yeni Turnuva</button>
+    </div>
+    <div id="tournament-list"><div class="spinner-wrap" style="min-height:200px"><div class="spinner"></div></div></div>
+  </div>`;
+}
+
+async function bindHome() {
+  bindNav();
+  document.getElementById('new-tournament-btn').addEventListener('click', showNewTournamentModal);
+  await loadTournamentList();
+}
+
+async function loadTournamentList() {
+  const listEl = document.getElementById('tournament-list');
+  if (!listEl) return;
+  try {
+    const snap = await getDocs(collection(db, 'tournaments'));
+    const all = snap.docs.map(d => ({id:d.id,...d.data()}))
+      .sort((a,b) => (b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    if (!all.length) {
+      listEl.innerHTML = `<div class="empty"><div class="empty-icon">🏆</div><p>Henüz turnuva yok. İlk turnuvayı başlat!</p></div>`;
+      return;
+    }
+    listEl.innerHTML = all.map(t => {
+      const statusLabel = t.status === 'waiting' ? `<span class="badge b-yellow">Bekleniyor</span>` :
+        t.status === 'active' ? `<span class="badge b-green">Aktif</span>` :
+        `<span class="badge b-gray">Bitti</span>`;
+      const dt = t.createdAt?.seconds ? new Date(t.createdAt.seconds*1000).toLocaleDateString('tr-TR') : '';
+      return `<div class="t-item" data-id="${t.id}">
+        <div class="t-icon">🏆</div>
+        <div class="t-info">
+          <div class="t-name">${t.name} ${statusLabel}</div>
+          <div class="text-muted text-sm">${t.players?.length||0} oyuncu · ${dt}</div>
+        </div>
+        <span style="color:var(--text-3);font-size:1.2rem">›</span>
+      </div>`;
+    }).join('');
+    listEl.querySelectorAll('.t-item').forEach(el => {
+      el.addEventListener('click', () => openTournament(el.dataset.id));
+    });
+  } catch(e) {
+    listEl.innerHTML = `<div class="alert a-error">Yüklenemedi: ${e.message}</div>`;
+  }
+}
+
+async function openTournament(id) {
+  try {
+    const snap = await getDoc(doc(db,'tournaments',id));
+    if (!snap.exists()) { alert('Turnuva bulunamadı'); return; }
+    currentTournament = {id:snap.id,...snap.data()};
+    currentPage = 'tournament';
+    currentTab = 'standings';
+    renderApp();
+  } catch(e) { alert(e.message); }
+}
+
+// ── NEW TOURNAMENT MODAL ──────────────────────────────────────────────────────
+function showNewTournamentModal() {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-title">🏆 Yeni Turnuva <button class="btn btn-ghost btn-sm" id="m-close">✕</button></div>
+      <div id="m-err"></div>
+      <div class="fg">
+        <label class="fl">Turnuva Adı</label>
+        <input class="fi" id="m-tname" placeholder="PES Ligi 2025" />
+      </div>
+      <div class="fg">
+        <label class="fl">Oyuncu 1 (Sen)</label>
+        <input class="fi" value="${userProfile?.username || ''}" id="m-p1" readonly style="opacity:.6" />
+      </div>
+      <div class="fg">
+        <label class="fl">Oyuncu 2</label>
+        <input class="fi" id="m-p2" placeholder="kanka1" />
+      </div>
+      <div class="fg">
+        <label class="fl">Oyuncu 3</label>
+        <input class="fi" id="m-p3" placeholder="kanka2" />
+      </div>
+      <div class="fg" style="margin-bottom:20px">
+        <label class="fl">Oyuncu 4</label>
+        <input class="fi" id="m-p4" placeholder="kanka3" />
+      </div>
+      <div class="alert a-info mb-16" style="font-size:.8rem">ℹ️ 4 oyuncu girilince fikstür otomatik oluşur (rövanşlı, herkes herkesle 2 maç).</div>
+      <button class="btn btn-primary btn-full" id="m-create">Turnuvayı Başlat</button>
+    </div>`;
+  overlay.classList.remove('hidden');
+  overlay.querySelector('#m-close').onclick = () => overlay.classList.add('hidden');
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.add('hidden'); });
+  overlay.querySelector('#m-create').addEventListener('click', async () => {
+    const errEl = document.getElementById('m-err');
+    errEl.innerHTML = '';
+    const name = document.getElementById('m-tname').value.trim();
+    const p1name = userProfile?.username || currentUser.displayName || '';
+    const p2 = document.getElementById('m-p2').value.trim();
+    const p3 = document.getElementById('m-p3').value.trim();
+    const p4 = document.getElementById('m-p4').value.trim();
+    if (!name) { errEl.innerHTML = `<div class="alert a-error">Turnuva adı gir</div>`; return; }
+    if (!p2||!p3||!p4) { errEl.innerHTML = `<div class="alert a-error">Tüm oyuncuları gir</div>`; return; }
+    const btn = document.getElementById('m-create');
+    btn.disabled = true; btn.textContent = 'Oluşturuluyor...';
+    try {
+      const players = [
+        {uid:currentUser.uid, username:p1name},
+        {uid:'p2_'+p2.toLowerCase(), username:p2},
+        {uid:'p3_'+p3.toLowerCase(), username:p3},
+        {uid:'p4_'+p4.toLowerCase(), username:p4},
+      ];
+      const tRef = await addDoc(collection(db,'tournaments'), {
+        name, createdBy: currentUser.uid, status:'active', players,
+        createdAt: serverTimestamp()
       });
-    }
-
-    async function joinTournament(code, username) {
-      const q = query(collection(db,'tournaments'), where('joinCode','==',code));
-      const snap = await getDocs(q);
-      if (snap.empty) throw new Error('Turnuva bulunamadı');
-      const tDoc = snap.docs[0];
-      if (tDoc.data().status !== 'waiting') throw new Error('Turnuva zaten başladı');
-      if (tDoc.data().players.find(p=>p.uid===currentUser.uid)) throw new Error('Zaten katıldınız');
-      await updateDoc(doc(db,'tournaments',tDoc.id), { players: arrayUnion({uid:currentUser.uid,username}) });
-    }
-
-    async function getUserTournaments() {
-      const snap = await getDocs(collection(db,'tournaments'));
-      return snap.docs.map(d=>({id:d.id,...d.data()}))
-        .filter(t=>t.players?.some(p=>p.uid===currentUser.uid))
-        .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    }
-
-    async function getTournament(id) {
-      const snap = await getDoc(doc(db,'tournaments',id));
-      if (!snap.exists()) throw new Error('Turnuva bulunamadı');
-      return {id:snap.id,...snap.data()};
-    }
-
-    async function getMatches(tournamentId) {
-      const q = query(collection(db,'matches'), where('tournamentId','==',tournamentId));
-      const snap = await getDocs(q);
-      return snap.docs.map(d=>({id:d.id,...d.data()}));
-    }
-
-    async function generateFixture(tournamentId, players) {
-      const batch = [];
+      // Generate fixture: double round robin (each pair plays twice, home/away swapped)
+      const matches = [];
       for (let i=0;i<players.length;i++) {
-        for (let j=i+1;j<players.length;j++) {
-          batch.push(addDoc(collection(db,'matches'), {
-            tournamentId, homeUid:players[i].uid, homeName:players[i].username,
-            awayUid:players[j].uid, awayName:players[j].username,
-            status:'pending', homeGoals:null, awayGoals:null,
-            homeRedCards:0, awayRedCards:0, deductHomeRed:false, deductAwayRed:false,
-            submittedBy:null, createdAt:serverTimestamp(),
+        for (let j=0;j<players.length;j++) {
+          if (i===j) continue;
+          matches.push(addDoc(collection(db,'matches'), {
+            tournamentId: tRef.id,
+            homeUid: players[i].uid, homeName: players[i].username,
+            awayUid: players[j].uid, awayName: players[j].username,
+            status: 'pending',
+            homeGoals: null, awayGoals: null,
+            homeRedCards: 0, awayRedCards: 0,
+            submittedBy: null, submittedAt: null,
+            approvals: [], // array of uids who approved
+            createdAt: serverTimestamp()
           }));
         }
       }
-      await Promise.all(batch);
-      await updateDoc(doc(db,'tournaments',tournamentId), {status:'active'});
+      await Promise.all(matches);
+      overlay.classList.add('hidden');
+      await openTournament(tRef.id);
+    } catch(e) {
+      errEl.innerHTML = `<div class="alert a-error">${e.message}</div>`;
+      btn.disabled=false; btn.textContent='Turnuvayı Başlat';
     }
+  });
+}
 
-    async function submitResult(matchId, uid, hg, ag, hr, ar, dh, da) {
-      await updateDoc(doc(db,'matches',matchId), {
-        status:'submitted', homeGoals:hg, awayGoals:ag,
-        homeRedCards:hr, awayRedCards:ar, deductHomeRed:dh, deductAwayRed:da,
-        submittedBy:uid, submittedAt:serverTimestamp(),
+// ── TOURNAMENT PAGE ───────────────────────────────────────────────────────────
+function renderTournamentShell() {
+  return `
+  <div id="t-wrap">
+    <div style="margin-bottom:16px">
+      <h2 class="display" style="font-size:2rem" id="t-title">Yükleniyor...</h2>
+      <div id="t-subtitle" class="text-muted text-sm"></div>
+    </div>
+    <div class="tabs mb-16" id="t-tabs">
+      <button class="tab ${currentTab==='standings'?'active':''}" data-tab="standings">Puan Tablosu</button>
+      <button class="tab ${currentTab==='fixtures'?'active':''}" data-tab="fixtures">Maçlar</button>
+      <button class="tab ${currentTab==='stats'?'active':''}" data-tab="stats">İstatistikler</button>
+    </div>
+    <div id="t-body"><div class="spinner-wrap" style="min-height:200px"><div class="spinner"></div></div></div>
+  </div>`;
+}
+
+function subscribeTournament() {
+  if (!currentTournament) return;
+
+  // Listen tournament doc
+  unsubTournament = onSnapshot(doc(db,'tournaments',currentTournament.id), snap => {
+    if (snap.exists()) currentTournament = {id:snap.id,...snap.data()};
+    renderTournamentContent();
+  });
+
+  // Listen matches
+  const q = query(collection(db,'matches'), where('tournamentId','==',currentTournament.id));
+  unsubMatches = onSnapshot(q, snap => {
+    currentMatches = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderTournamentContent();
+  });
+
+  // Tab clicks
+  document.getElementById('t-tabs')?.addEventListener('click', e => {
+    const t = e.target.closest('.tab');
+    if (!t) return;
+    currentTab = t.dataset.tab;
+    document.querySelectorAll('#t-tabs .tab').forEach(b => b.classList.toggle('active', b===t));
+    renderTournamentContent();
+  });
+}
+
+function renderTournamentContent() {
+  const titleEl = document.getElementById('t-title');
+  const subEl = document.getElementById('t-subtitle');
+  const bodyEl = document.getElementById('t-body');
+  if (!titleEl||!bodyEl) return;
+  if (currentTournament) {
+    titleEl.textContent = currentTournament.name;
+    const confirmed = currentMatches.filter(m=>m.status==='confirmed').length;
+    const total = currentMatches.length;
+    subEl.textContent = `${confirmed}/${total} maç tamamlandı`;
+  }
+  if (currentTab==='standings') bodyEl.innerHTML = renderStandings();
+  else if (currentTab==='fixtures') { bodyEl.innerHTML = renderFixtures(); bindFixtures(); }
+  else if (currentTab==='stats') bodyEl.innerHTML = renderStats();
+}
+
+// ── STANDINGS ─────────────────────────────────────────────────────────────────
+function renderStandings() {
+  if (!currentTournament?.players) return `<div class="empty"><p>Yükleniyor...</p></div>`;
+  const rows = calcStandings(currentTournament.players, currentMatches);
+  const ranks = ['r1','r2','r3','r4'];
+  return `
+  <div class="card">
+    <table class="stbl">
+      <thead>
+        <tr>
+          <th>#</th><th style="text-align:left">Oyuncu</th><th>O</th><th>G</th><th>B</th><th>M</th>
+          <th>AG</th><th>YG</th><th>AV</th><th>🟥</th><th>P</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map((p,i) => `
+          <tr>
+            <td><span class="rank-badge ${ranks[i]||'r4'}">${i+1}</span></td>
+            <td><div class="p-cell"><div class="avatar">${p.username[0]}</div>${p.username}</div></td>
+            <td>${p.played}</td><td>${p.won}</td><td>${p.drawn}</td><td>${p.lost}</td>
+            <td>${p.goalsFor}</td><td>${p.goalsAgainst}</td>
+            <td style="color:${p.goalDiff>=0?'var(--accent)':'var(--red)'}">${p.goalDiff>0?'+':''}${p.goalDiff}</td>
+            <td style="color:var(--red)">${p.redCards}</td>
+            <td style="font-weight:700;color:var(--accent)">${p.points}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:10px;font-size:.75rem;color:var(--text-3);text-align:center">O=Oyun · G=Galibiyet · B=Beraberlik · M=Mağlubiyet · AV=Averaj · P=Puan</div>`;
+}
+
+// ── FIXTURES ──────────────────────────────────────────────────────────────────
+function renderFixtures() {
+  if (!currentMatches.length) return `<div class="empty"><div class="empty-icon">📅</div><p>Henüz maç yok</p></div>`;
+  
+  // Group by round pairs
+  const pending = currentMatches.filter(m=>m.status==='pending');
+  const submitted = currentMatches.filter(m=>m.status==='submitted');
+  const disputed = currentMatches.filter(m=>m.status==='disputed');
+  const confirmed = currentMatches.filter(m=>m.status==='confirmed');
+
+  let html = '';
+  if (submitted.length||disputed.length) {
+    html += `<h3 class="section-title">⚠️ Onay Bekliyor</h3>`;
+    html += [...submitted,...disputed].map(m => renderMatchCard(m, true)).join('');
+  }
+  if (pending.length) {
+    html += `<h3 class="section-title">📅 Oynanacak Maçlar</h3>`;
+    html += pending.map(m => renderMatchCard(m, false)).join('');
+  }
+  if (confirmed.length) {
+    html += `<h3 class="section-title">✅ Tamamlanan Maçlar</h3>`;
+    html += confirmed.map(m => renderMatchCard(m, false)).join('');
+  }
+  return html;
+}
+
+function renderMatchCard(m, highlight) {
+  const myUid = currentUser.uid;
+  const players = currentTournament?.players || [];
+  const totalPlayers = players.length;
+  const isSubmitter = m.submittedBy === myUid;
+  const alreadyApproved = m.approvals?.includes(myUid);
+  const approvalCount = m.approvals?.length || 0;
+  const needed = 2; // need 2 approvals total
+
+  let scoreHtml = '';
+  if (m.status === 'confirmed' || m.status === 'submitted' || m.status === 'disputed') {
+    const hg = m.homeGoals ?? '-';
+    const ag = m.awayGoals ?? '-';
+    scoreHtml = `<div class="match-score">${hg}<span class="score-sep">-</span>${ag}</div>`;
+  } else {
+    scoreHtml = `<div class="match-vs">VS</div>`;
+  }
+
+  let actionsHtml = '';
+  if (m.status === 'pending') {
+    actionsHtml = `
+      <div class="match-actions">
+        <button class="btn btn-primary btn-sm" data-action="score" data-id="${m.id}">Skor Gir</button>
+      </div>`;
+  } else if (m.status === 'submitted' || m.status === 'disputed') {
+    // Approval dots
+    const dots = Array(totalPlayers).fill(0).map((_,i) => {
+      const approved = m.approvals?.includes(players[i]?.uid);
+      return `<div class="apv-dot ${approved?'approved':''}" title="${players[i]?.username||'?'}"></div>`;
+    }).join('');
+    actionsHtml = `
+      <div class="match-actions" style="flex-direction:column;gap:8px">
+        <div style="font-size:.75rem;color:var(--text-2);text-align:center">${approvalCount}/${needed} onay</div>
+        <div class="approval-bar">${dots}</div>
+        <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+          ${!alreadyApproved ? `<button class="btn btn-primary btn-sm" data-action="approve" data-id="${m.id}">✓ Onayla</button>` : `<span class="badge b-green">Onayladın ✓</span>`}
+          <button class="btn btn-danger btn-sm" data-action="dispute" data-id="${m.id}">⚠️ İtiraz</button>
+          <button class="btn btn-secondary btn-sm" data-action="edit" data-id="${m.id}">Düzenle</button>
+        </div>
+      </div>`;
+  }
+
+  const redCardsRow = (m.status==='confirmed'||m.status==='submitted') && (m.homeRedCards||m.awayRedCards) ? `
+    <div class="red-cards-row">
+      <span>🟥 ${m.homeName}: ${m.homeRedCards}</span>
+      <span>🟥 ${m.awayName}: ${m.awayRedCards}</span>
+    </div>` : '';
+
+  const statusBadge = m.status==='confirmed' ? `<span class="badge b-green">Onaylandı</span>` :
+    m.status==='submitted' ? `<span class="badge b-yellow">Onay Bekliyor</span>` :
+    m.status==='disputed' ? `<span class="badge b-red">İtiraz</span>` : '';
+
+  return `
+  <div class="match-card ${highlight?'needs-action':''}" data-mid="${m.id}">
+    <div class="match-row">
+      <div class="match-team"><div class="match-name">${m.homeName}</div></div>
+      ${scoreHtml}
+      <div class="match-team"><div class="match-name">${m.awayName}</div></div>
+    </div>
+    ${redCardsRow}
+    ${statusBadge ? `<div style="text-align:center;margin-top:8px">${statusBadge}</div>` : ''}
+    ${actionsHtml}
+  </div>`;
+}
+
+function bindFixtures() {
+  document.getElementById('t-body')?.addEventListener('click', async e => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    const action = btn.dataset.action;
+    const id = btn.dataset.id;
+    const match = currentMatches.find(m=>m.id===id);
+    if (!match) return;
+    if (action==='score'||action==='edit') showScoreModal(match);
+    if (action==='approve') await doApprove(match);
+    if (action==='dispute') await doDispute(match);
+  });
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function renderStats() {
+  if (!currentTournament?.players) return `<div class="empty"><p>Yükleniyor...</p></div>`;
+  const confirmed = currentMatches.filter(m=>m.status==='confirmed');
+  const players = currentTournament.players;
+
+  // Per-player stats
+  const stats = {};
+  players.forEach(p => {
+    stats[p.uid] = {username:p.username, goals:0, redCards:0, wins:0, draws:0, losses:0, matches:0, cleanSheets:0};
+  });
+  confirmed.forEach(m => {
+    const h = stats[m.homeUid], a = stats[m.awayUid];
+    if (!h||!a) return;
+    h.goals += m.homeGoals; a.goals += m.awayGoals;
+    h.redCards += m.homeRedCards; a.redCards += m.awayRedCards;
+    h.matches++; a.matches++;
+    if (m.homeGoals > m.awayGoals) { h.wins++; a.losses++; }
+    else if (m.awayGoals > m.homeGoals) { a.wins++; h.losses++; }
+    else { h.draws++; a.draws++; }
+    if (m.awayGoals===0) h.cleanSheets++;
+    if (m.homeGoals===0) a.cleanSheets++;
+  });
+
+  const rows = Object.values(stats).sort((a,b)=>b.goals-a.goals);
+  const topScorer = rows[0];
+  const mostRed = [...rows].sort((a,b)=>b.redCards-a.redCards)[0];
+
+  return `
+  <div class="stat-grid mb-16">
+    <div class="stat-box"><div class="stat-val">${confirmed.length}</div><div class="stat-lbl">Tamamlanan Maç</div></div>
+    <div class="stat-box"><div class="stat-val">${confirmed.reduce((s,m)=>s+m.homeGoals+m.awayGoals,0)}</div><div class="stat-lbl">Toplam Gol</div></div>
+    <div class="stat-box"><div class="stat-val">${confirmed.reduce((s,m)=>s+m.homeRedCards+m.awayRedCards,0)}</div><div class="stat-lbl">Toplam Kırmızı Kart</div></div>
+    <div class="stat-box"><div class="stat-val">${confirmed.length ? (confirmed.reduce((s,m)=>s+m.homeGoals+m.awayGoals,0)/confirmed.length).toFixed(1) : '0'}</div><div class="stat-lbl">Maç Başı Gol</div></div>
+  </div>
+
+  <h3 class="section-title">⚽ Oyuncu İstatistikleri</h3>
+  <div class="card mb-16">
+    <table class="stbl">
+      <thead>
+        <tr><th style="text-align:left">Oyuncu</th><th>Maç</th><th>Gol</th><th>G/Maç</th><th>🟥</th><th>Galibiyet</th><th>Temiz Kale</th></tr>
+      </thead>
+      <tbody>
+        ${rows.map(p => `
+          <tr>
+            <td><div class="p-cell"><div class="avatar">${p.username[0]}</div>${p.username}</div></td>
+            <td>${p.matches}</td>
+            <td style="color:var(--accent);font-weight:700">${p.goals}</td>
+            <td>${p.matches?((p.goals/p.matches).toFixed(1)):'0'}</td>
+            <td style="color:var(--red)">${p.redCards}</td>
+            <td>${p.wins}</td>
+            <td>${p.cleanSheets}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  ${topScorer ? `
+  <h3 class="section-title">🏅 Liderler</h3>
+  <div class="stat-grid">
+    <div class="stat-box"><div class="stat-val">${topScorer.username[0]}</div><div class="stat-lbl">Top Scorer: ${topScorer.username} (${topScorer.goals})</div></div>
+    <div class="stat-box"><div class="stat-val">${mostRed?.username[0]||'-'}</div><div class="stat-lbl">En Fazla Kırmızı: ${mostRed?.username||'-'} (${mostRed?.redCards||0})</div></div>
+  </div>` : ''}`;
+}
+
+// ── SCORE MODAL ───────────────────────────────────────────────────────────────
+function showScoreModal(match) {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-title">⚽ Skor Gir <button class="btn btn-ghost btn-sm" id="m-close">✕</button></div>
+      <div id="m-err"></div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:end;margin-bottom:16px">
+        <div class="fg" style="margin-bottom:0">
+          <label class="fl">${match.homeName}</label>
+          <input class="fi" id="r-hg" type="number" min="0" max="99" placeholder="0" value="${match.homeGoals??''}" style="text-align:center;font-size:1.6rem;font-family:'Bebas Neue'" />
+        </div>
+        <div style="padding-bottom:6px;color:var(--text-3);font-family:'Bebas Neue';font-size:1.4rem">—</div>
+        <div class="fg" style="margin-bottom:0">
+          <label class="fl">${match.awayName}</label>
+          <input class="fi" id="r-ag" type="number" min="0" max="99" placeholder="0" value="${match.awayGoals??''}" style="text-align:center;font-size:1.6rem;font-family:'Bebas Neue'" />
+        </div>
+      </div>
+
+      <div style="background:var(--bg-el);border-radius:10px;padding:14px;margin-bottom:16px">
+        <div style="font-size:.72rem;font-weight:700;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🟥 Kırmızı Kartlar (opsiyonel)</div>
+        <div class="grid-2">
+          <div>
+            <label class="fl" style="font-size:.7rem">${match.homeName}</label>
+            <input class="fi" id="r-hr" type="number" min="0" max="11" value="${match.homeRedCards||0}" style="text-align:center" />
+          </div>
+          <div>
+            <label class="fl" style="font-size:.7rem">${match.awayName}</label>
+            <input class="fi" id="r-ar" type="number" min="0" max="11" value="${match.awayRedCards||0}" style="text-align:center" />
+          </div>
+        </div>
+      </div>
+
+      <div class="alert a-info mb-16" style="font-size:.78rem">ℹ️ En az 2 kişinin onayı gerekiyor. Herkes onaylayabilir.</div>
+      <button class="btn btn-primary btn-full" id="m-submit">Sonucu Gönder</button>
+    </div>`;
+  overlay.classList.remove('hidden');
+  overlay.querySelector('#m-close').onclick = () => overlay.classList.add('hidden');
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.add('hidden'); });
+
+  overlay.querySelector('#m-submit').addEventListener('click', async () => {
+    const errEl = document.getElementById('m-err');
+    errEl.innerHTML='';
+    const hg = document.getElementById('r-hg').value;
+    const ag = document.getElementById('r-ag').value;
+    if (hg===''||ag==='') { errEl.innerHTML=`<div class="alert a-error">Skoru gir</div>`; return; }
+    const btn = document.getElementById('m-submit');
+    btn.disabled=true; btn.textContent='Gönderiliyor...';
+    try {
+      await updateDoc(doc(db,'matches',match.id), {
+        status:'submitted',
+        homeGoals:+hg, awayGoals:+ag,
+        homeRedCards:+document.getElementById('r-hr').value||0,
+        awayRedCards:+document.getElementById('r-ar').value||0,
+        submittedBy:currentUser.uid,
+        submittedAt:serverTimestamp(),
+        approvals:[currentUser.uid] // submitter auto-approves
       });
+      overlay.classList.add('hidden');
+    } catch(e) {
+      errEl.innerHTML=`<div class="alert a-error">${e.message}</div>`;
+      btn.disabled=false; btn.textContent='Sonucu Gönder';
     }
+  });
+}
 
-    async function confirmMatch(matchId) {
-      await updateDoc(doc(db,'matches',matchId), {status:'confirmed', confirmedAt:serverTimestamp()});
-    }
+// ── APPROVE / DISPUTE ─────────────────────────────────────────────────────────
+async function doApprove(match) {
+  const uid = currentUser.uid;
+  const currentApprovals = match.approvals || [];
+  if (currentApprovals.includes(uid)) return;
+  const newApprovals = [...currentApprovals, uid];
+  const needed = 2;
+  const newStatus = newApprovals.length >= needed ? 'confirmed' : 'submitted';
+  try {
+    await updateDoc(doc(db,'matches',match.id), {
+      approvals: newApprovals,
+      status: newStatus,
+      ...(newStatus==='confirmed' ? {confirmedAt:serverTimestamp()} : {})
+    });
+  } catch(e) { alert(e.message); }
+}
 
-    async function disputeMatch(matchId) {
-      await updateDoc(doc(db,'matches',matchId), {status:'disputed'});
-    }
+async function doDispute(match) {
+  if (!confirm('İtiraz ediliyor. Skor silinecek ve tekrar girilmesi gerekecek. Devam?')) return;
+  try {
+    await updateDoc(doc(db,'matches',match.id), {
+      status:'pending', homeGoals:null, awayGoals:null,
+      homeRedCards:0, awayRedCards:0,
+      submittedBy:null, approvals:[], submittedAt:null
+    });
+  } catch(e) { alert(e.message); }
+}
 
-    // ─── CALC STANDINGS ────────────────────────────────────────────────────────
-    function calcStandings(players, matches) {
-      const table = {};
-      players.forEach(p => {
-        table[p.uid] = {uid:p.uid,username:p.username,played:0,won:0,drawn:0,lost:0,goalsFor:0,goalsAgainst:0,redCards:0,points:0};
-      });
-      matches.filter(m=>m.status==='confirmed').forEach(m => {
-        const h=table[m.homeUid], a=table[m.awayUid];
-        if(!h||!a) return;
-        let hg = m.deductHomeRed?Math.max(0,m.homeGoals-m.homeRedCards):m.homeGoals;
-        let ag = m.deductAwayRed?Math.max(0,m.awayGoals-m.awayRedCards):m.awayGoals;
-        h.played++; a.played++;
-        h.goalsFor+=hg; h.goalsAgainst+=ag;
-        a.goalsFor+=ag; a.goalsAgainst+=hg;
-        h.redCards+=m.homeRedCards; a.redCards+=m.awayRedCards;
-        if(hg>ag){h.won++;h.points+=3;a.lost++;}
-        else if(ag>hg){a.won++;a.points+=3;h.lost++;}
-        else{h.drawn++;h.points++;a.drawn++;a.points++;}
-      });
-      return Object.values(table)
-        .map(p=>({...p,goalDiff:p.goalsFor-p.goalsAgainst}))
-        .sort((a,b)=>b.points-a.points||b.goalDiff-a.goalDiff||b.goalsFor-a.goalsFor);
+// ── CHANGE USERNAME MODAL ─────────────────────────────────────────────────────
+function showChangeNameModal() {
+  const overlay = document.getElementById('modal-overlay');
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-title">✏️ Kullanıcı Adı <button class="btn btn-ghost btn-sm" id="m-close">✕</button></div>
+      <div id="m-err"></div>
+      <div class="fg mb-16">
+        <label class="fl">Yeni Kullanıcı Adı</label>
+        <input class="fi" id="m-newname" value="${userProfile?.username||''}" />
+      </div>
+      <div class="alert a-warn mb-16" style="font-size:.8rem">⚠️ Ad değişince aktif turnuvalarda gösterim değişmez (sadece yeni turnuvalar için).</div>
+      <button class="btn btn-primary btn-full" id="m-savename">Kaydet</button>
+    </div>`;
+  overlay.classList.remove('hidden');
+  overlay.querySelector('#m-close').onclick = () => overlay.classList.add('hidden');
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.add('hidden'); });
+  overlay.querySelector('#m-savename').addEventListener('click', async () => {
+    const newname = document.getElementById('m-newname').value.trim();
+    const errEl = document.getElementById('m-err');
+    if (!newname) { errEl.innerHTML=`<div class="alert a-error">Ad gir</div>`; return; }
+    const btn = document.getElementById('m-savename');
+    btn.disabled=true; btn.textContent='Kaydediliyor...';
+    try {
+      await updateProfile(currentUser, {displayName: newname});
+      await updateDoc(doc(db,'users',currentUser.uid), {username: newname});
+      userProfile = {...(userProfile||{}), username: newname};
+      overlay.classList.add('hidden');
+      // Re-render nav
+      document.querySelector('.nav-user').textContent = newname;
+    } catch(e) {
+      errEl.innerHTML=`<div class="alert a-error">${e.message}</div>`;
+      btn.disabled=false; btn.textContent='Kaydet';
     }
-  </script>
+  });
+}
+
+// ── CALC STANDINGS ────────────────────────────────────────────────────────────
+function calcStandings(players, matches) {
+  const t = {};
+  players.forEach(p => {
+    t[p.uid] = {uid:p.uid,username:p.username,played:0,won:0,drawn:0,lost:0,goalsFor:0,goalsAgainst:0,redCards:0,points:0};
+  });
+  matches.filter(m=>m.status==='confirmed').forEach(m => {
+    const h=t[m.homeUid], a=t[m.awayUid];
+    if(!h||!a) return;
+    const hg=m.homeGoals, ag=m.awayGoals;
+    h.played++; a.played++;
+    h.goalsFor+=hg; h.goalsAgainst+=ag;
+    a.goalsFor+=ag; a.goalsAgainst+=hg;
+    h.redCards+=m.homeRedCards||0; a.redCards+=m.awayRedCards||0;
+    if(hg>ag){h.won++;h.points+=3;a.lost++;}
+    else if(ag>hg){a.won++;a.points+=3;h.lost++;}
+    else{h.drawn++;h.points++;a.drawn++;a.points++;}
+  });
+  return Object.values(t)
+    .map(p=>({...p,goalDiff:p.goalsFor-p.goalsAgainst}))
+    .sort((a,b)=>b.points-a.points||b.goalDiff-a.goalDiff||b.goalsFor-a.goalsFor);
+}
+</script>
+
+<!-- Global modal overlay + nav binding -->
+<div class="overlay hidden" id="modal-overlay"></div>
 </body>
 </html>
