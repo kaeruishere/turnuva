@@ -1,8 +1,8 @@
-import { db, state } from './app.js';
+import { db, state, esc } from './app.js';
 import { showToast, SPIN, formatDate } from './ui.js';
 import {
   collection, query, orderBy, onSnapshot, getDocs, doc,
-  setDoc, getDoc, where, serverTimestamp, limit
+  setDoc, getDoc, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ─── İDDİA GİRİŞ SAYFASI ───
@@ -13,24 +13,23 @@ export function renderBets() {
 
   state.unsub.forEach(u => u()); state.unsub = [];
 
-  // Aktif turnuvayı bul
   const q = query(collection(db, 'tournaments'), where('status', '==', 'active'));
   const u = onSnapshot(q, async snap => {
     if (snap.empty) {
       main.innerHTML = `<div class="empty"><div class="empty-icon">🎯</div>Aktif turnuva yok.</div>`;
       return;
     }
-    const tourney  = { id: snap.docs[0].id, ...snap.docs[0].data() };
-    const msSnap   = await getDocs(query(collection(db, `tournaments/${tourney.id}/matches`), orderBy('slot')));
-    const matches  = msSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const next     = matches.find(m => !m.done);
+    const tourney = { id: snap.docs[0].id, ...snap.docs[0].data() };
+    const msSnap  = await getDocs(query(collection(db, `tournaments/${tourney.id}/matches`), orderBy('slot')));
+    const matches = msSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const next    = matches.find(m => !m.done);
 
     if (!next) {
       main.innerHTML = `<div class="empty"><div class="empty-icon">🏆</div>Tüm maçlar bitti!<br>İddia girilecek maç kalmadı.</div>`;
       return;
     }
 
-    // Kullanıcının bu maça önceki iddiasını çek
+    // Kullanıcının önceki iddiasını çek
     const betRef  = doc(db, `tournaments/${tourney.id}/matches/${next.id}/bets`, state.user.username);
     const betSnap = await getDoc(betRef);
     const prev    = betSnap.exists() ? betSnap.data() : null;
@@ -47,11 +46,11 @@ function drawBetForm(tourney, match, prev) {
     <div class="sec-label" style="margin-top:0">Sıradaki Maç</div>
     <div class="card mb-5 p-0">
       <div class="next-match">
-        <div class="nm-team">${match.home}</div>
+        <div class="nm-team">${esc(match.home)}</div>
         <div class="nm-vs">VS</div>
-        <div class="nm-team">${match.away}</div>
+        <div class="nm-team">${esc(match.away)}</div>
       </div>
-      <div class="nm-slot">Maç ${match.slot+1}</div>
+      <div class="nm-slot">Maç ${match.slot + 1}</div>
     </div>
 
     <div class="sec-label">İddialarını Gir</div>
@@ -61,9 +60,9 @@ function drawBetForm(tourney, match, prev) {
       <div class="bet-section">
         <div class="bet-title">⚽ Maç Sonucu</div>
         <div class="bet-options" id="bet-result">
-          ${betOption('result', '1', match.home, prev?.result)}
+          ${betOption('result', '1', esc(match.home), prev?.result)}
           ${betOption('result', 'X', 'Beraberlik', prev?.result)}
-          ${betOption('result', '2', match.away, prev?.result)}
+          ${betOption('result', '2', esc(match.away), prev?.result)}
         </div>
       </div>
 
@@ -89,9 +88,9 @@ function drawBetForm(tourney, match, prev) {
       <div class="bet-section" style="border:none">
         <div class="bet-title">🥅 İlk Gol Atan Taraf</div>
         <div class="bet-options" id="bet-firstgoal">
-          ${betOption('firstgoal', match.home, match.home, prev?.firstgoal)}
+          ${betOption('firstgoal', match.home, esc(match.home), prev?.firstgoal)}
           ${betOption('firstgoal', 'berabere', 'Gol Olmaz', prev?.firstgoal)}
-          ${betOption('firstgoal', match.away, match.away, prev?.firstgoal)}
+          ${betOption('firstgoal', match.away, esc(match.away), prev?.firstgoal)}
         </div>
       </div>
 
@@ -103,17 +102,17 @@ function drawBetForm(tourney, match, prev) {
     </button>
   `;
 
-  // Seçim toggle
-  main.querySelectorAll('.bet-opt').forEach(btn => {
-    btn.onclick = () => {
-      const grp = btn.dataset.group;
-      main.querySelectorAll(`.bet-opt[data-group="${grp}"]`).forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-    };
+  // Seçim toggle — event delegation ile tek listener
+  main.querySelector('#bet-form').addEventListener('click', e => {
+    const btn = e.target.closest('.bet-opt');
+    if (!btn) return;
+    const grp = btn.dataset.group;
+    main.querySelectorAll(`.bet-opt[data-group="${grp}"]`).forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
   });
 
   document.getElementById('btn-save-bet').onclick = async () => {
-    const get = grp => main.querySelector(`.bet-opt.selected[data-group="${grp}"]`)?.dataset.val;
+    const get  = grp => main.querySelector(`.bet-opt.selected[data-group="${grp}"]`)?.dataset.val;
     const result    = get('result');
     const goals     = get('goals');
     const redcard   = get('redcard');
@@ -123,6 +122,9 @@ function drawBetForm(tourney, match, prev) {
       showToast('Tüm alanları doldur!', 'error'); return;
     }
 
+    const saveBtn = document.getElementById('btn-save-bet');
+    saveBtn.disabled = true; saveBtn.textContent = '⏳ Kaydediliyor...';
+
     const betRef = doc(db, `tournaments/${tourney.id}/matches/${match.id}/bets`, state.user.username);
     await setDoc(betRef, {
       username: state.user.username,
@@ -131,6 +133,8 @@ function drawBetForm(tourney, match, prev) {
       updatedAt: serverTimestamp()
     });
     showToast('✅ İddia kaydedildi!');
+    saveBtn.disabled = false;
+    saveBtn.textContent = '✏️ İddiayı Güncelle';
   };
 }
 
@@ -166,45 +170,44 @@ export function renderResults() {
       return;
     }
 
-    // Tüm bitlenen maçların iddialarını çek + skor hesapla
+    // ── Paralel bet fetch ──
     const players = tourney.players || [];
-    const scores  = {}; // username → puan
-    players.forEach(p => scores[p.toLowerCase().replace(' ', '_')] = 0);
+    const scores  = {};
+    players.forEach(p => { scores[p] = 0; });
 
-    const matchResults = [];
-
-    for (const match of done) {
+    const matchResults = await Promise.all(done.map(async match => {
       const betsSnap = await getDocs(collection(db, `tournaments/${tourney.id}/matches/${match.id}/bets`));
-      const bets = betsSnap.docs.map(d => d.data());
-
-      const actual = resolveActual(match);
-      const row    = { match, bets: [], actual };
+      const bets     = betsSnap.docs.map(d => d.data());
+      const actual   = resolveActual(match);
+      const row      = { match, actual, bets: [] };
 
       for (const bet of bets) {
         const pts = calcPoints(bet, actual);
-        if (!scores[bet.username]) scores[bet.username] = 0;
-        scores[bet.username] += pts;
+        scores[bet.username] = (scores[bet.username] ?? 0) + pts;
         row.bets.push({ ...bet, pts });
       }
-      matchResults.push(row);
-    }
+      return row;
+    }));
 
     drawResults(matchResults, scores, players);
   });
   state.unsub.push(u);
 }
 
+// ─── Maç sonucunu hesapla ───
 function resolveActual(m) {
   const totalGoals = m.hG + m.aG;
-  const hasRed     = (m.hRed||0) + (m.aRed||0) > 0;
-  let result, firstgoal;
+  const hasRed     = (m.hRed || 0) + (m.aRed || 0) > 0;
 
+  let result;
   if (m.hG > m.aG)      result = '1';
   else if (m.aG > m.hG) result = '2';
   else                   result = 'X';
 
-  if (m.hG > 0 || m.aG > 0) firstgoal = m.hG > 0 ? m.home : m.away; // basit yaklaşım: ev sahibi gol attıysa ev
-  else                       firstgoal = 'berabere';
+  // İlk gol: eğer hiç gol yoksa 'berabere', yoksa gol atan takımı bul
+  // Not: İlk golü giren tarafı bilemiyoruz ama maç sonu skoruyla tahmin ediyoruz.
+  // Ev sahibi gol atmışsa ev sahibi, atmamışsa deplasman.
+  const firstgoal = (m.hG === 0 && m.aG === 0) ? 'berabere' : (m.hG > 0 ? m.home : m.away);
 
   return {
     result,
@@ -226,7 +229,6 @@ function calcPoints(bet, actual) {
 function drawResults(matchResults, scores, players) {
   const main = document.getElementById('main');
 
-  // Sıralama
   const sorted = Object.entries(scores)
     .sort((a, b) => b[1] - a[1])
     .map(([u, pts]) => ({ u, pts }));
@@ -244,8 +246,8 @@ function drawResults(matchResults, scores, players) {
         <tbody>
           ${sorted.map((s, i) => `
             <tr>
-              <td class="${['rank-1','rank-2','rank-3'][i]||''}" style="font-weight:700">${i+1}</td>
-              <td class="pl-name">${s.u}</td>
+              <td class="${['rank-1','rank-2','rank-3'][i] || ''}" style="font-weight:700">${i + 1}</td>
+              <td class="pl-name">${esc(s.u)}</td>
               <td class="text-accent text-bold">${s.pts}</td>
             </tr>
           `).join('')}
@@ -261,27 +263,27 @@ function drawResults(matchResults, scores, players) {
     html += `
       <div class="card" style="margin-bottom:12px">
         <div class="card-header">
-          <span style="font-weight:700">${match.home} ${match.hG} - ${match.aG} ${match.away}</span>
-          <span style="font-size:.72rem;color:var(--text2)">Maç ${match.slot+1}</span>
+          <span style="font-weight:700">${esc(match.home)} ${match.hG} - ${match.aG} ${esc(match.away)}</span>
+          <span style="font-size:.72rem;color:var(--text-muted)">Maç ${match.slot + 1}</span>
         </div>
         <div style="padding:4px 0">
-          <!-- actual -->
-          <div style="padding:8px 14px;border-bottom:1px solid var(--border);font-size:.75rem;color:var(--text2);display:flex;gap:12px">
-            <span>Sonuç: <b style="color:var(--text)">${actual.result}</b></span>
-            <span>Gol: <b style="color:var(--text)">${actual.goals}</b></span>
-            <span>Kırmızı: <b style="color:var(--text)">${actual.redcard}</b></span>
-            <span>İlk gol: <b style="color:var(--text)">${actual.firstgoal}</b></span>
+          <!-- Gerçek sonuç -->
+          <div style="padding:8px 14px;border-bottom:1px solid var(--border-color);font-size:.75rem;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap">
+            <span>Sonuç: <b style="color:var(--text-main)">${actual.result}</b></span>
+            <span>Gol: <b style="color:var(--text-main)">${actual.goals}</b></span>
+            <span>Kırmızı: <b style="color:var(--text-main)">${actual.redcard}</b></span>
+            <span>İlk gol: <b style="color:var(--text-main)">${esc(actual.firstgoal)}</b></span>
           </div>
           ${bets.length === 0
             ? `<div class="empty" style="padding:14px">Bu maç için iddia girilmedi</div>`
-            : bets.sort((a,b)=>b.pts-a.pts).map(bet => `
-              <div style="padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <div style="font-weight:600;font-size:.86rem">${bet.username}</div>
-                <div style="display:flex;gap:8px;font-size:.75rem;color:var(--text2)">
-                  <span class="${bet.result===actual.result?'hit':'miss'}">${bet.result}</span>
-                  <span class="${bet.goals===actual.goals?'hit':'miss'}">${bet.goals}</span>
-                  <span class="${bet.redcard===actual.redcard?'hit':'miss'}">${bet.redcard}</span>
-                  <span class="${bet.firstgoal===actual.firstgoal?'hit':'miss'}">${bet.firstgoal}</span>
+            : bets.sort((a, b) => b.pts - a.pts).map(bet => `
+              <div style="padding:9px 14px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <div style="font-weight:600;font-size:.86rem">${esc(bet.username)}</div>
+                <div style="display:flex;gap:8px;font-size:.75rem;color:var(--text-muted)">
+                  <span class="${bet.result    === actual.result    ? 'hit' : 'miss'}">${bet.result}</span>
+                  <span class="${bet.goals     === actual.goals     ? 'hit' : 'miss'}">${bet.goals}</span>
+                  <span class="${bet.redcard   === actual.redcard   ? 'hit' : 'miss'}">${bet.redcard}</span>
+                  <span class="${bet.firstgoal === actual.firstgoal ? 'hit' : 'miss'}">${esc(bet.firstgoal)}</span>
                 </div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--accent);min-width:28px;text-align:right">
                   ${bet.pts}p

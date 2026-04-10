@@ -102,6 +102,8 @@ body {
 
 .hidden { display: none !important; }
 .text-center { text-align: center; }
+.flex-grow { flex: 1; }
+.mt-0 { margin-top: 0; }
 
 /* ─── CARDS & GLASSMORPHISM ─── */
 .card {
@@ -239,6 +241,26 @@ body {
 }
 .fi::placeholder { color: rgba(139, 155, 180, 0.5); }
 
+/* .input is an alias for .fi (used inside modals) */
+.input {
+  width: 100%;
+  background: rgba(10, 13, 20, 0.5);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--border-radius-md);
+  padding: 14px 16px;
+  color: var(--text-main);
+  outline: none;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all var(--transition-speed);
+}
+.input:focus {
+  border-color: var(--accent);
+  background: rgba(0, 229, 160, 0.05);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+.input::placeholder { color: rgba(139, 155, 180, 0.5); }
+
 /* ─── NAVIGATIONS ─── */
 .nav {
   background: rgba(10, 13, 20, 0.85);
@@ -356,6 +378,13 @@ body {
 .back-btn::before { content: '←'; font-size: 1.2rem; }
 
 .detail-name { font-size: 2.2rem; line-height: 1.1; margin-bottom: 6px; }
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.detail-meta { font-size: 0.8rem; color: var(--text-muted); }
 
 .match-row {
   display: flex; align-items: center; padding: 14px 12px;

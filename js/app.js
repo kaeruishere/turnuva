@@ -24,7 +24,28 @@ export const state = {
   unsub:         [],     // firestore listeners
 };
 
-export const DEFAULT_PLAYERS = ['Umut', 'Mehmet Emin', 'Salih', 'Mert'];
+// ─── PLAYERS ───
+const FALLBACK_PLAYERS = ['Umut', 'Mehmet Emin', 'Salih', 'Mert'];
+
+export function getDefaultPlayers() {
+  try {
+    const raw = localStorage.getItem('pes_default_players');
+    return raw ? JSON.parse(raw) : [...FALLBACK_PLAYERS];
+  } catch { return [...FALLBACK_PLAYERS]; }
+}
+
+export function saveDefaultPlayers(players) {
+  localStorage.setItem('pes_default_players', JSON.stringify(players));
+}
+
+// ─── XSS GUARD ───
+export function esc(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 
 export function getTournamentName() {
   const d   = new Date();

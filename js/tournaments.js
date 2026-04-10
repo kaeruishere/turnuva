@@ -1,5 +1,5 @@
-import { db, state, DEFAULT_PLAYERS, getTournamentName } from './app.js';
-import { showToast, formatDate, SPIN } from './ui.js';
+import { db, state, getDefaultPlayers, getTournamentName, esc } from './app.js';
+import { showToast, formatDate, SPIN, openModal, closeModal } from './ui.js';
 import {
   collection, query, orderBy, onSnapshot, getDocs,
   addDoc, updateDoc, deleteDoc, doc, where, serverTimestamp
@@ -10,16 +10,16 @@ export function renderTournaments(navigate) {
   const main = document.getElementById('main');
   main.innerHTML = SPIN;
 
-  // Önceki listener'ları temizle
   state.unsub.forEach(u => u());
   state.unsub = [];
 
   const q = query(collection(db, 'tournaments'), orderBy('createdAt', 'desc'));
   const u = onSnapshot(q, async (snap) => {
-    const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const all    = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     const active = all.filter(t => t.status === 'active');
     const old    = all.filter(t => t.status !== 'active');
 
+    // ── Paralel matchCount fetch ──
     const matchCounts = {};
     await Promise.all(all.map(async t => {
       const ms   = await getDocs(collection(db, `tournaments/${t.id}/matches`));
@@ -47,11 +47,7 @@ export function renderTournaments(navigate) {
 
     main.innerHTML = html;
 
-    document.getElementById('btn-new-t').onclick = async () => {
-      const btn = document.getElementById('btn-new-t');
-      btn.disabled = true; btn.textContent = '⏳ Oluşturuluyor...';
-      await createTournament(getTournamentName(), DEFAULT_PLAYERS);
-    };
+    document.getElementById('btn-new-t').onclick = () => openNewTournamentModal(navigate);
 
     main.querySelectorAll('.t-card').forEach(card => {
       card.onclick = () => navigate('detail', card.dataset.id);
@@ -67,7 +63,7 @@ function cardHTML(t, mc, isActive) {
     <div class="card card-hoverable t-card ${isActive ? 'active-t' : ''}" data-id="${t.id}" style="padding:14px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
       <div class="t-card-accent"></div>
       <div>
-        <div class="t-card-name">${t.name}</div>
+        <div class="t-card-name">${esc(t.name)}</div>
         <div class="t-card-meta">${formatDate(t.createdAt)} · ${done}/${total} maç tamamlandı</div>
       </div>
       <div class="flex items-center gap-2">
@@ -89,14 +85,15 @@ export async function createTournament(name, players) {
   });
 
   const schedule = generateSchedule(players);
-  for (let i = 0; i < schedule.length; i++) {
-    await addDoc(collection(db, `tournaments/${tRef.id}/matches`), {
+  await Promise.all(schedule.map((pair, i) =>
+    addDoc(collection(db, `tournaments/${tRef.id}/matches`), {
       slot: i,
-      home: players[schedule[i][0]],
-      away: players[schedule[i][1]],
+      home: players[pair[0]],
+      away: players[pair[1]],
       hG: 0, aG: 0, hRed: 0, aRed: 0, done: false
-    });
-  }
+    })
+  ));
+
   showToast('🏆 Turnuva oluşturuldu!');
   return tRef.id;
 }
@@ -116,4 +113,59 @@ function generateSchedule(players) {
   }
   [...sched].forEach(([a, b]) => sched.push([b, a]));
   return sched;
+}
+
+export function openNewTournamentModal(navigate) {
+  // Her açılışta localStorage'dan taze oku
+  let players = getDefaultPlayers();
+
+  const render = () => {
+    openModal(`
+      <div class="modal">
+        <h3 class="modal-title">🏆 Yeni Turnuva</h3>
+        <p class="text-sm text-muted mb-4">Katılacak oyuncuları düzenle:</p>
+
+        <div id="new-t-players" class="flex flex-col gap-2 mb-4">
+          ${players.map((p, i) => `
+            <div class="flex gap-2">
+              <input type="text" class="input flex-grow p-input" value="${esc(p)}" data-index="${i}" placeholder="Oyuncu adı" style="padding:10px 14px;">
+              <button class="btn btn-ghost btn-sm p-del" data-index="${i}" title="Sil">✕</button>
+            </div>
+          `).join('')}
+        </div>
+
+        <button class="btn btn-secondary btn-sm btn-full mb-5" id="btn-add-p">＋ Oyuncu Ekle</button>
+
+        <div class="flex gap-3">
+          <button class="btn btn-ghost flex-grow" id="btn-cancel">İptal</button>
+          <button class="btn btn-primary flex-grow" id="btn-start" ${players.filter(p => p.trim()).length < 2 ? 'disabled' : ''}>Başlat</button>
+        </div>
+      </div>
+    `);
+
+    const list = document.getElementById('new-t-players');
+
+    list.querySelectorAll('.p-input').forEach(input => {
+      input.oninput = e => { players[+e.target.dataset.index] = e.target.value; };
+    });
+    list.querySelectorAll('.p-del').forEach(btn => {
+      btn.onclick = () => { players.splice(+btn.dataset.index, 1); render(); };
+    });
+
+    document.getElementById('btn-add-p').onclick = () => { players.push(''); render(); };
+    document.getElementById('btn-cancel').onclick = closeModal;
+
+    document.getElementById('btn-start').onclick = async () => {
+      const finalPlayers = players.map(p => p.trim()).filter(Boolean);
+      if (finalPlayers.length < 2) {
+        showToast('En az 2 oyuncu lazım', 'error'); return;
+      }
+      const btn = document.getElementById('btn-start');
+      btn.disabled = true; btn.textContent = '⏳ Oluşturuluyor...';
+      await createTournament(getTournamentName(), finalPlayers);
+      closeModal();
+    };
+  };
+
+  render();
 }
