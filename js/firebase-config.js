@@ -3,12 +3,12 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.11.1/firebas
 import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
 
 const firebaseConfig = {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "turnuva-kaeru.firebaseapp.com",
-    projectId: "turnuva-kaeru",
-    storageBucket: "turnuva-kaeru.firebasestorage.app",
-    messagingSenderId: "2078204583",
-    appId: "1:2078204583:web:2c83665f82417e3e843182"
+  apiKey: "VITE_FIREBASE_API_KEY",
+  authDomain: "VITE_FIREBASE_AUTH_DOMAIN",
+  projectId: "VITE_FIREBASE_PROJECT_ID",
+  storageBucket: "VITE_FIREBASE_STORAGE_BUCKET",
+  messagingSenderId: "VITE_FIREBASE_MESSAGING_SENDER_ID",
+  appId: "VITE_FIREBASE_APP_ID"
 };
 
 // Initialize Firebase
