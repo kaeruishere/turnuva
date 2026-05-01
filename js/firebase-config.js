@@ -3,7 +3,7 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.11.1/firebas
 import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCII19pXF_SLL2Tkjw3FeaPxYHNQ_b3J_Q",
+    apiKey: "YOUR_FIREBASE_API_KEY",
     authDomain: "turnuva-kaeru.firebaseapp.com",
     projectId: "turnuva-kaeru",
     storageBucket: "turnuva-kaeru.firebasestorage.app",
