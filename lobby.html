@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PES Turnuva — Lobi</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .tab { padding: 0.8rem 1rem; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; white-space: nowrap; font-size: 0.85rem; }
+        .tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .match-card { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: var(--transition); }
+        .match-card:hover { background: rgba(255,255,255,0.05); }
+        .match-score { font-weight: 800; font-size: 1.2rem; background: var(--card-bg); padding: 0.3rem 0.8rem; border-radius: 8px; min-width: 60px; text-align: center; }
+        .team-name { flex: 1; font-weight: 500; font-size: 0.9rem; }
+        .team-right { text-align: right; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+        .stat-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); }
+        .stat-value { font-weight: 600; color: var(--secondary); }
+    </style>
+</head>
+<body>
+    <nav class="app-bar">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <a href="index.html" style="text-decoration: none; color: var(--text-main); font-size: 1.2rem;">←</a>
+            <img id="user-profile-img" class="profile-img" onclick="window.location.href='profile.html'" style="display: none;">
+        </div>
+        <div id="t-name-card" class="card-header">YÜKLENİYOR...</div>
+        <div id="user-actions" style="display: flex; gap: 0.5rem; align-items: center;">
+            <button id="btn-settings" class="btn btn-secondary" style="padding: 0.6rem; border-radius: 50%; width: 36px; height: 36px; display: none;">⚙️</button>
+            <div id="admin-actions"></div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <main>
+            <!-- Pre-start Lobby Info -->
+            <div id="lobby-pre-start" class="card" style="display: none; margin-bottom: 2rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    Bekleme Odası 
+                    <span id="ready-count" style="font-size: 0.8rem; font-weight: 400; color: var(--text-muted);">0/0 Hazır</span>
+                </h3>
+                <div id="participants-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem; margin-bottom: 1.5rem;">
+                </div>
+                <button id="btn-ready" class="btn btn-primary" style="width: 100%;">Hazır Ol</button>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" data-target="tab-standings">Puan Durumu</div>
+                <div class="tab" data-target="tab-matches">Maçlar</div>
+                <div class="tab" data-target="tab-stats">İstatistikler</div>
+            </div>
+
+            <!-- Standings -->
+            <div id="tab-standings" class="tab-content active">
+                <div class="card" style="padding: 0;">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px;">#</th>
+                                    <th>Oyuncu</th>
+                                    <th style="text-align: center;">O</th>
+                                    <th style="text-align: center;">G</th>
+                                    <th style="text-align: center;" class="hide-mobile">B</th>
+                                    <th style="text-align: center;" class="hide-mobile">M</th>
+                                    <th style="text-align: center;">AV</th>
+                                    <th style="text-align: center;">P</th>
+                                </tr>
+                            </thead>
+                            <tbody id="standings-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matches -->
+            <div id="tab-matches" class="tab-content">
+                <div id="matches-list">
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div id="tab-stats" class="tab-content">
+                <div id="stats-container">
+                    <div class="card" style="text-align: center; color: var(--text-muted);">
+                        İstatistikler hesaplanıyor...
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="modal-settings" class="modal-overlay">
+        <div class="modal">
+            <h2 style="margin-bottom: 1.5rem;">Turnuva Ayarları</h2>
+            <form id="form-settings">
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Erişim Türü</label>
+                <select id="setting-entry" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.8rem; color: var(--text-main); margin-bottom: 1.2rem;">
+                    <option value="public">Herkese Açık</option>
+                    <option value="password">Şifreli</option>
+                </select>
+
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Skor Giriş Yetkisi</label>
+                <select id="setting-score" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.8rem; color: var(--text-main); margin-bottom: 1.5rem;">
+                    <option value="admin">Sadece Organizatör</option>
+                    <option value="all">Tüm Katılımcılar</option>
+                </select>
+
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <button type="button" class="btn btn-secondary btn-close-modal" style="flex: 1;">Kapat</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Kaydet</button>
+                </div>
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1rem 0;">
+                <button type="button" id="btn-finish-manual" class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem; color: var(--primary);">Turnuvayı Bitir</button>
+                <button type="button" id="btn-delete-tournament" class="btn btn-secondary" style="width: 100%; color: var(--accent);">Turnuvayı Sil</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="js/lobby-main.js"></script>
+</body>
+</html>

@@ -1,100 +1,95 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>PES Ligi</title>
-  <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap"
-    rel="stylesheet" />
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PES Turnuva — Ana Sayfa</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
-
 <body>
+    <nav class="app-bar">
+        <div id="user-profile" onclick="window.location.href='profile.html'" style="cursor: pointer;">
+            <!-- User photo injected here -->
+        </div>
+        <div class="card-header">ANA SAYFA</div>
+        <div id="app-actions">
+            <button id="btn-logout" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.7rem;">Çıkış</button>
+        </div>
+    </nav>
 
-  <div id="root"></div>
-  <div class="overlay hidden" id="modal-overlay"></div>
-  <div class="toast" id="toast"></div>
+    <div class="container">
+        <main>
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <button id="btn-show-create" class="btn btn-primary" style="flex: 1.5;">Yeni Turnuva Oluştur</button>
+                <button id="btn-show-join-code" class="btn btn-secondary" style="flex: 1;">Kodla Katıl</button>
+            </div>
 
-  <script type="module">
-    import { state, loadSession, clearSession, saveSession } from './js/app.js';
-    import { db } from './js/app.js';
-    import { renderLogin } from './js/auth.js';
-    import { renderTournaments } from './js/tournaments.js';
-    import { renderDetail } from './js/detail.js';
-    import { renderBets, renderResults } from './js/bets.js';
-    import { openSettings } from './js/settings.js';
-    import { renderTopNav, renderNav, showToast } from './js/ui.js';
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+            <section id="tournaments-section">
+                <h2 style="margin-bottom: 1.5rem; font-size: 1.2rem;">Açık Turnuvalar</h2>
+                <div id="tournaments-list">
+                    <div class="card" style="text-align: center; color: var(--text-muted);">
+                        Yükleniyor...
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
-    // ─── ROUTER ───
-    function navigate(page, id = null) {
-      state.page = page;
+    <!-- Create Tournament Modal -->
+    <div id="modal-create" class="modal-overlay">
+        <div class="modal">
+            <h2 style="margin-bottom: 1.5rem;">Yeni Turnuva</h2>
+            <form id="form-create">
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Turnuva Adı</label>
+                <input type="text" id="tournament-name" placeholder="Örn: Şampiyonlar Ligi 2025" required>
+                
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Şifre (Opsiyonel)</label>
+                <input type="password" id="tournament-password" placeholder="Katılım için şifre">
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="button" class="btn btn-secondary btn-close-modal" style="flex: 1;">İptal</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Oluştur</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-      // Detail sayfası dışında listener'ları temizle
-      if (page !== 'detail') {
-        state.unsub.forEach(u => u()); state.unsub = [];
-        state.tourney = null; state.matches = [];
-      }
+    <!-- Join Tournament (Password) Modal -->
+    <div id="modal-join" class="modal-overlay">
+        <div class="modal">
+            <h2 id="join-title" style="margin-bottom: 1rem;">Turnuvaya Katıl</h2>
+            <p id="join-desc" style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;"></p>
+            <form id="form-join">
+                <input type="hidden" id="join-id">
+                <label style="display: block; margin-bottom: 0.5rem; font-size: 0.9rem;">Giriş Şifresi</label>
+                <input type="password" id="join-password" placeholder="Şifreyi giriniz" required>
+                
+                <div style="display: flex; gap: 1rem;">
+                    <button type="button" class="btn btn-secondary btn-close-modal" style="flex: 1;">İptal</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Giriş Yap</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-      renderShell();
+    <!-- Join by Code Modal -->
+    <div id="modal-join-code" class="modal-overlay">
+        <div class="modal">
+            <h2 style="margin-bottom: 1rem;">Kod ile Katıl</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">Size verilen 6 haneli turnuva kodunu giriniz.</p>
+            <form id="form-join-code">
+                <input type="text" id="input-join-code" placeholder="Örn: PES-X7K" maxlength="8" required style="text-align: center; font-size: 1.5rem; letter-spacing: 2px;">
+                <div style="display: flex; gap: 1rem;">
+                    <button type="button" class="btn btn-secondary btn-close-modal" style="flex: 1;">İptal</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Katıl</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-      if (page === 'tournaments') renderTournaments(navigate);
-      else if (page === 'detail') renderDetail(id, navigate);
-      else if (page === 'bets') renderBets();
-      else if (page === 'results') renderResults();
-
-      // Bottom nav aktif sekme
-      document.querySelectorAll('.bnav-btn').forEach(btn => {
-        const p = btn.dataset.page;
-        btn.classList.toggle('active', p === page || (page === 'detail' && p === 'tournaments'));
-      });
-    }
-
-    function renderShell() {
-      document.getElementById('root').innerHTML = `
-    ${renderTopNav(state.user.username)}
-    <main class="main" id="main"></main>
-    ${renderNav(state.page)}
-  `;
-
-      document.getElementById('btn-settings-nav').onclick = () => openSettings(navigate);
-      document.getElementById('btn-logout').onclick = () => {
-        clearSession(); state.user = null;
-        state.unsub.forEach(u => u()); state.unsub = [];
-        renderLogin(onLoginSuccess);
-      };
-
-      document.querySelectorAll('.bnav-btn').forEach(btn => {
-        btn.onclick = () => {
-          const p = btn.dataset.page;
-          if (p !== state.page) navigate(p);
-        };
-      });
-    }
-
-    function onLoginSuccess() { navigate('tournaments'); }
-
-    // ─── BOOT ───
-    async function boot() {
-      const session = loadSession();
-      if (session) {
-        try {
-          const snap = await getDoc(doc(db, 'users', session.username));
-          if (snap.exists()) {
-            state.user = { username: session.username, ...snap.data() };
-            navigate('tournaments');
-            return;
-          }
-        } catch (e) { }
-      }
-      renderLogin(onLoginSuccess);
-    }
-
-    boot();
-  </script>
+    <script type="module" src="js/index-main.js"></script>
 </body>
-
 </html>

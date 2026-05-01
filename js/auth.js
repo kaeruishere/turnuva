@@ -1,52 +1,34 @@
-import { db, state, saveSession } from './app.js';
-import { showToast } from './ui.js';
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { 
+    signInWithPopup, 
+    onAuthStateChanged, 
+    signOut,
+    deleteUser
+} from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+import { auth, provider } from "./firebase-config.js";
 
-export function renderLogin(onSuccess) {
-  document.getElementById('root').innerHTML = `
-    <div class="login-wrap">
-      <div class="login-box">
-        <div class="login-logo">⚽ <span>PES</span> LİGİ</div>
-        <div class="login-sub">Kanka moduna giriş yap</div>
-        <div class="login-err hidden" id="login-err">Kullanıcı adı veya şifre hatalı.</div>
-        <div class="fi-group">
-          <label class="fi-label">Kullanıcı Adı</label>
-          <input class="fi" id="inp-user" placeholder="kullaniciadi" autocomplete="username" />
-        </div>
-        <div class="fi-group mb-5">
-          <label class="fi-label">Şifre</label>
-          <input class="fi" id="inp-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
-        </div>
-        <button class="btn btn-primary btn-full" id="btn-login">Giriş Yap</button>
-      </div>
-    </div>
-  `;
-
-  const tryLogin = async () => {
-    const u = document.getElementById('inp-user').value.trim().toLowerCase();
-    const p = document.getElementById('inp-pass').value;
-    if (!u || !p) return;
-
-    const btn = document.getElementById('btn-login');
-    btn.textContent = '...'; btn.disabled = true;
-
+export const login = async () => {
     try {
-      const snap = await getDoc(doc(db, 'users', u));
-      if (!snap.exists() || snap.data().password !== p) {
-        document.getElementById('login-err').classList.remove('hidden');
-        btn.textContent = 'Giriş Yap'; btn.disabled = false;
-        return;
-      }
-      state.user = { username: u, ...snap.data() };
-      saveSession(state.user);
-      onSuccess();
-    } catch (e) {
-      console.error(e);
-      btn.textContent = 'Giriş Yap'; btn.disabled = false;
+        const result = await signInWithPopup(auth, provider);
+        return result.user;
+    } catch (error) {
+        console.error("Login Error:", error);
+        return null;
     }
-  };
+};
 
-  document.getElementById('btn-login').onclick = tryLogin;
-  document.getElementById('inp-pass').onkeydown = e => { if (e.key === 'Enter') tryLogin(); };
-  document.getElementById('inp-user').onkeydown = e => { if (e.key === 'Enter') document.getElementById('inp-pass').focus(); };
-}
+export const logout = () => signOut(auth);
+
+export const deleteUserAccount = async () => {
+    const user = auth.currentUser;
+    if (user) {
+        await deleteUser(user);
+        return true;
+    }
+    return false;
+};
+
+export const observeAuth = (callback) => {
+    return onAuthStateChanged(auth, callback);
+};
+
+export const getCurrentUser = () => auth.currentUser;

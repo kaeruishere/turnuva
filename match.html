@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PES Turnuva — Maç Detayı</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        .scoreboard { display: flex; justify-content: space-around; align-items: center; padding: 2rem 1rem; margin-bottom: 2rem; background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%); border-radius: 24px; border: 1px solid var(--border-color); }
+        .score-team { text-align: center; flex: 1; }
+        .score-team h2 { font-size: 1.2rem; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .score-number { font-size: 3.5rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 15px rgba(0,255,136,0.3); }
+        .score-divider { font-size: 1.5rem; color: var(--text-muted); padding: 0 0.5rem; }
+        .odds-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-top: 1rem; }
+        .odds-box { background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 12px; text-align: center; border: 1px solid var(--border-color); }
+        .odds-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.3rem; }
+        .odds-val { font-size: 1.1rem; font-weight: 700; color: var(--secondary); }
+    </style>
+</head>
+<body>
+    <nav class="app-bar">
+        <a id="back-link" href="#" style="text-decoration: none; color: var(--text-main); font-size: 1.2rem;">←</a>
+        <div class="card-header">MAÇ DETAYI</div>
+        <div style="width: 36px;"></div> <!-- Spacer -->
+    </nav>
+
+    <div class="container">
+        <main>
+            <div class="scoreboard">
+                <div class="score-team">
+                    <h2 id="home-name">...</h2>
+                    <div id="home-score-val" class="score-number">-</div>
+                </div>
+                <div class="score-divider">:</div>
+                <div class="score-team">
+                    <h2 id="away-name">...</h2>
+                    <div id="away-score-val" class="score-number">-</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="font-size: 0.8rem; margin-bottom: 1rem; color: var(--secondary); text-transform: uppercase; letter-spacing: 1px;">📊 İddia Oranları & Form</h3>
+                <div id="odds-container" class="odds-grid">
+                    <div class="odds-box">
+                        <div class="odds-label">Ev (1)</div>
+                        <div id="odd-1" class="odds-val">-</div>
+                    </div>
+                    <div class="odds-box">
+                        <div class="odds-label">Ber. (X)</div>
+                        <div id="odd-x" class="odds-val">-</div>
+                    </div>
+                    <div class="odds-box">
+                        <div class="odds-label">Dep. (2)</div>
+                        <div id="odd-2" class="odds-val">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-panel" class="card" style="display: none;">
+                <h3 style="font-size: 0.8rem; margin-bottom: 1.5rem; text-transform: uppercase;">Skor Girişi</h3>
+                <form id="form-score">
+                    <div style="display: flex; gap: 0.8rem; align-items: center; margin-bottom: 1.5rem;">
+                        <input type="number" id="input-home" placeholder="Ev" min="0" required style="text-align: center; font-size: 1.5rem; padding: 1rem;">
+                        <span style="font-size: 1.5rem;">-</span>
+                        <input type="number" id="input-away" placeholder="Dep" min="0" required style="text-align: center; font-size: 1.5rem; padding: 1rem;">
+                    </div>
+                    <textarea id="match-notes" placeholder="Maç notları..." rows="3" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.8rem; color: var(--text-main); margin-bottom: 1rem; font-family: inherit; font-size: 0.9rem;"></textarea>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Kaydet</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="js/match-main.js"></script>
+</body>
+</html>

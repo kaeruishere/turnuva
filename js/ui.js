@@ -1,62 +1,52 @@
-// ─── TOAST ───
-export function showToast(msg, type = 'success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
-  clearTimeout(t._t);
-  t._t = setTimeout(() => t.className = 'toast', 2800);
-}
+// UI Helper Functions
 
-// ─── MODAL ───
-export function openModal(html) {
-  const o = document.getElementById('modal-overlay');
-  o.innerHTML = html;
-  o.classList.remove('hidden');
-  return o;
-}
-export function closeModal() {
-  document.getElementById('modal-overlay').classList.add('hidden');
-}
+export const showModal = (modalId) => {
+    document.getElementById(modalId).style.display = 'flex';
+};
 
-// ─── BOTTOM NAV ───
-export function renderNav(activePage) {
-  const tabs = [
-    { id: 'tournaments', icon: '🏆', label: 'Turnuvalar' },
-    { id: 'bets',        icon: '🎯', label: 'İddia'      },
-    { id: 'results',     icon: '📊', label: 'Sonuçlar'   },
-  ];
-  return `
-    <nav class="bottom-nav">
-      ${tabs.map(t => `
-        <button class="bnav-btn ${activePage === t.id ? 'active' : ''}" data-page="${t.id}">
-          <span class="bnav-icon">${t.icon}</span>
-          <span class="bnav-label">${t.label}</span>
-        </button>
-      `).join('')}
-    </nav>
-  `;
-}
+export const hideModal = (modalId) => {
+    document.getElementById(modalId).style.display = 'none';
+};
 
-// ─── TOP NAV ───
-export function renderTopNav(username) {
-  return `
-    <nav class="nav">
-      <div class="nav-brand">⚽ <span>PES</span> LİGİ</div>
-      <div class="nav-right">
-        <span class="nav-user">${username}</span>
-        <button class="btn btn-ghost btn-sm" id="btn-settings-nav">⚙️</button>
-        <button class="btn btn-ghost btn-sm" id="btn-logout">Çıkış</button>
-      </div>
-    </nav>
-  `;
-}
+export const setupModalClose = () => {
+    document.querySelectorAll('.btn-close-modal').forEach(btn => {
+        btn.onclick = (e) => {
+            const modal = e.target.closest('.modal-overlay');
+            if (modal) modal.style.display = 'none';
+        };
+    });
+};
 
-// ─── SPINNER ───
-export const SPIN = `<div class="spin"></div>`;
+export const renderTournamentCard = (tournament) => {
+    const statusLabel = {
+        'waiting': 'Bekliyor',
+        'active': 'Devam Ediyor',
+        'finished': 'Tamamlandı'
+    };
 
-// ─── FORMAT DATE ───
-export function formatDate(ts) {
-  if (!ts) return '';
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  return d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
-}
+    const statusColor = {
+        'waiting': 'var(--secondary)',
+        'active': 'var(--primary)',
+        'finished': 'var(--text-muted)'
+    };
+
+    return `
+        <div class="card tournament-card" data-id="${tournament.id}" data-has-pass="${!!tournament.password}">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="margin-bottom: 0.2rem;">${tournament.name}</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Kod: ${tournament.code}</p>
+                </div>
+                <span style="font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 20px; background: ${statusColor[tournament.status]}33; color: ${statusColor[tournament.status]}; border: 1px solid ${statusColor[tournament.status]}66;">
+                    ${statusLabel[tournament.status]}
+                </span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.9rem; color: var(--text-muted);">${tournament.participants.length} Katılımcı</span>
+                <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); window.joinFromList('${tournament.id}', ${!!tournament.password}, '${tournament.name}')">
+                    ${tournament.password ? '🔑 Katıl' : 'Giriş Yap'}
+                </button>
+            </div>
+        </div>
+    `;
+};
